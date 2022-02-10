@@ -1,0 +1,18 @@
+version: "3" # composeファイルのバージョン
+
+services: 
+    app: # サービス名
+        build: . # ビルドに使うDockerfileの場所
+        tty: true # コンテナの永続化
+        ports: # ホストOSのポートとコンテナのポートをつなげる 
+            - "8080:8080"
+        volumes:
+            - ./app:/go/src/app # マウントディレクトリ
+        env_file: build.env
+
+    postgres:
+        image: postgres:latest
+        restart: always
+        env_file: db.env
+        ports:
+        - 5432:5432
