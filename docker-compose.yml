@@ -8,7 +8,6 @@ services:
             - "8080:8080"
         volumes:
             - ./app:/go/src/app # マウントディレクトリ
-        env_file: build.env
 
     postgres:
         image: postgres:latest

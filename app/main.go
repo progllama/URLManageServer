@@ -28,10 +28,5 @@ func main() {
 		// users.DELETE("/:id", user_controller.Delete)
 	}
 
-	url := router.Group("/url")
-	{
-
-	}
-
 	router.Run(":8080")
 }
