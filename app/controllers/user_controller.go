@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -29,11 +30,15 @@ func (_ UserController) Create(c *gin.Context) {
 	var u repository.UserRepository
 	p, err := u.CreateModel(c)
 
+	fmt.Println(p)
+
 	if err != nil {
 		c.AbortWithStatus(400)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.JSON(201, p)
+		c.HTML(http.StatusOK, "user_show.tmpl", gin.H{
+			"name": p.Name,
+		})
 	}
 }
 
@@ -48,7 +53,7 @@ func (_ UserController) Show(c *gin.Context) {
 		c.AbortWithStatus(400)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.JSON(200, user)
+		c.HTML(http.StatusOK, "user_show.html", gin.H{"name": user.Name})
 	}
 }
 

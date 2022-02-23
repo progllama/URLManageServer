@@ -15,15 +15,18 @@ func main() {
 	{
 		auth_controller := controllers.AuthController{}
 		router.POST("/sign_in", auth_controller.SignIn)
-		// router.POST("/sign_up", auth_controller.SignOut)
+		router.POST("/sign_out", auth_controller.SignOut)
+		router.GET("/sign_up", auth_controller.SignUp)
 	}
 
 	users := router.Group("/users")
 	{
 		user_controller := controllers.UserController{}
+
+		router.LoadHTMLGlob("templates/*.tmpl")
 		// users.GET("", user_controller.Index)
 		users.POST("", user_controller.Create)
-		// users.GET("/:id", user_controller.Show)
+		users.GET("/:id", user_controller.Show)
 		// users.PUT("/:id", user_controller.Update)
 		// users.DELETE("/:id", user_controller.Delete)
 	}

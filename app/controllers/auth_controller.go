@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,9 +16,13 @@ var (
 type AuthController struct{}
 
 func (_ AuthController) SignIn(c *gin.Context) {
-
+	c.HTML(http.StatusOK, "sing_up.tmpl", gin.H{})
 }
 
 func (_ AuthController) SignOut(c *gin.Context) {
 
+}
+
+func (_ AuthController) SignUp(c *gin.Context) {
+	c.HTML(http.StatusOK, "sign_up.tmpl", gin.H{})
 }

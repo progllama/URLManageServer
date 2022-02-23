@@ -31,9 +31,11 @@ func (_ UserRepository) GetAll() ([]UserProfile, error) {
 func (_ UserRepository) CreateModel(c *gin.Context) (User, error) {
 	db := db.GetDB()
 	var user User
-	if err := c.BindJSON(&user); err != nil {
-		return user, err
-	}
+
+	c.Request.ParseForm()
+	user.Name = c.Request.FormValue("Name")
+	user.Email = c.Request.FormValue("Email")
+	user.Password = c.Request.FormValue("Password")
 
 	user.CreatedAt = time.Now()
 	if err := db.Create(&user).Error; err != nil {
@@ -52,6 +54,15 @@ func (_ UserRepository) GetByID(id int) (UserProfile, error) {
 	db.Where("id = ?", id).First(&user_profile)
 
 	return user_profile, nil
+}
+
+func (_ UserRepository) GetByName(name string) UserProfile {
+	db := db.GetDB()
+	var user_profile UserProfile
+	if err := db.Table("users").Where("name=?", name).First(&user_profile).Error; err != nil {
+		return user_profile
+	}
+	return user_profile
 }
 
 // UpdateByID is update a User
