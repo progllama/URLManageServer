@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -16,12 +15,12 @@ type UserController struct{}
 // Index action: GET /users
 func (_ UserController) Index(c *gin.Context) {
 	var u repository.UserRepository
-	p, err := u.GetAll()
+	_, err := u.GetAll()
 	if err != nil {
 		c.AbortWithStatus(404)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.JSON(200, p)
+		c.HTML(http.StatusOK, "index.tmpl", gin.H{})
 	}
 }
 
@@ -30,15 +29,11 @@ func (_ UserController) Create(c *gin.Context) {
 	var u repository.UserRepository
 	p, err := u.CreateModel(c)
 
-	fmt.Println(p)
-
 	if err != nil {
 		c.AbortWithStatus(400)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.HTML(http.StatusOK, "user_show.tmpl", gin.H{
-			"name": p.Name,
-		})
+		c.Redirect(302, "/users/"+strconv.Itoa(int(p.ID)))
 	}
 }
 
@@ -53,7 +48,7 @@ func (_ UserController) Show(c *gin.Context) {
 		c.AbortWithStatus(400)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.HTML(http.StatusOK, "user_show.html", gin.H{"name": user.Name})
+		c.HTML(http.StatusOK, "user_show.tmpl", gin.H{"name": user.Name})
 	}
 }
 

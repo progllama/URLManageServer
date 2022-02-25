@@ -1,7 +1,8 @@
 package repository
 
 import (
-	"time"
+	"bcrypt"
+	"fmt"
 	"url_manager/db"
 	"url_manager/models"
 
@@ -32,12 +33,16 @@ func (_ UserRepository) CreateModel(c *gin.Context) (User, error) {
 	db := db.GetDB()
 	var user User
 
-	c.Request.ParseForm()
-	user.Name = c.Request.FormValue("Name")
-	user.Email = c.Request.FormValue("Email")
-	user.Password = c.Request.FormValue("Password")
+	// c.Request.ParseForm()
+	// user.Name = c.Request.FormValue("Name")
+	// user.Email = c.Request.FormValue("Email")
+	// user.Password = c.Request.FormValue("Password")
+	c.Bind(&user)
 
-	user.CreatedAt = time.Now()
+	user.Password = bcrypt.GenerateFromPassword(user.Password, 12) // 2 ^ 12 回　ストレッチ回数
+
+	fmt.Println(&user.ID, &user.Name, &user.CreatedAt)
+
 	if err := db.Create(&user).Error; err != nil {
 		return user, err
 	}
@@ -51,7 +56,7 @@ func (_ UserRepository) GetByID(id int) (UserProfile, error) {
 	if err := db.Table("users").Where("id = ?", id).First(&user_profile).Error; err != nil {
 		return user_profile, err
 	}
-	db.Where("id = ?", id).First(&user_profile)
+	db.Table("users").Where("id = ?", id).First(&user_profile)
 
 	return user_profile, nil
 }
