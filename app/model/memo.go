@@ -1,10 +1,9 @@
-package models
+package model
 
 import "github.com/jinzhu/gorm"
 
-type Status struct {
+type Memo struct {
 	gorm.Model
 	URLID   uint
-	Order   int
 	Content string
 }

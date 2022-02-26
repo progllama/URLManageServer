@@ -1,17 +1,17 @@
 package repository
 
 import (
-	"bcrypt"
-	"fmt"
 	"url_manager/db"
-	"url_manager/models"
+	"url_manager/model"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-gonic/gin"
 )
 
 type UserRepository struct{}
 
-type User models.User
+type User model.User
 
 type UserProfile struct {
 	Name string
@@ -39,9 +39,11 @@ func (_ UserRepository) CreateModel(c *gin.Context) (User, error) {
 	// user.Password = c.Request.FormValue("Password")
 	c.Bind(&user)
 
-	user.Password = bcrypt.GenerateFromPassword(user.Password, 12) // 2 ^ 12 回　ストレッチ回数
+	hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12) // 2 ^ 12 回　ストレッチ回数
 
-	fmt.Println(&user.ID, &user.Name, &user.CreatedAt)
+	if err != nil {
+		user.Password = string(hashedPass)
+	}
 
 	if err := db.Create(&user).Error; err != nil {
 		return user, err
@@ -71,9 +73,9 @@ func (_ UserRepository) GetByName(name string) UserProfile {
 }
 
 // UpdateByID is update a User
-func (_ UserRepository) UpdateByID(id int, c *gin.Context) (models.User, error) {
+func (_ UserRepository) UpdateByID(id int, c *gin.Context) (model.User, error) {
 	db := db.GetDB()
-	var user models.User
+	var user model.User
 	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
 		return user, err
 	}

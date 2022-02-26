@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"errors"
@@ -21,7 +21,7 @@ func (_ AuthController) SignUp(c *gin.Context) {
 }
 
 func (_ AuthController) SignIn(c *gin.Context) {
-	c.HTML(http.StatusOK, "sing_in.tmpl", gin.H{})
+	c.HTML(http.StatusOK, "sign_in.tmpl", gin.H{})
 }
 
 func (_ AuthController) CreateSession(c *gin.Context) {

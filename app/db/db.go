@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 	"os"
-	"url_manager/models"
+	"url_manager/model"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -47,5 +47,5 @@ func Close() {
 }
 
 func autoMigration() {
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&model.User{})
 }

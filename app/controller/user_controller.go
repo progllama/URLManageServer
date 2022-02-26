@@ -1,10 +1,10 @@
-package controllers
+package controller
 
 import (
 	"net/http"
 	"strconv"
 
-	"url_manager/models/repository"
+	"url_manager/model/repository"
 
 	"github.com/gin-gonic/gin"
 )

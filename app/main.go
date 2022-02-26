@@ -1,7 +1,7 @@
 package main
 
 import (
-	"url_manager/controllers"
+	"url_manager/controller"
 	"url_manager/db"
 
 	"github.com/gin-contrib/sessions"
@@ -13,23 +13,23 @@ func main() {
 	db.Init()
 
 	router := gin.Default()
-	router.LoadHTMLGlob("templates/*.tmpl")
+	router.LoadHTMLGlob("template/*.tmpl")
 
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("mysession", store))
 
 	{
-		auth_controller := AuthController{}
-		router.Use(auth_controller.SessionCheck)
+		auth_controller := controller.AuthController{}
 		router.GET("/sign_in", auth_controller.SignIn)
-		router.POST("/sing_in", auth_controller.CreateSession)
+		router.POST("/sign_in", auth_controller.CreateSession)
 		router.POST("/sign_out", auth_controller.DestroySession)
 		router.GET("/sign_up", auth_controller.SignUp)
 	}
 
 	users := router.Group("/users")
 	{
-		user_controller := controllers.UserController{}
+		user_controller := controller.UserController{}
+		auth_controller := controller.AuthController{}
 
 		users.Use(auth_controller.SessionCheck)
 
