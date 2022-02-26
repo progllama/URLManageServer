@@ -5,7 +5,9 @@ settings:
 schema:
 - name: app
   path: .
-  commands: {}
+  commands:
+    run:
+      status: true
   watcher:
     extensions:
     - go
