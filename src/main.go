@@ -9,9 +9,9 @@ import (
 func main() {
 	configs.LoadConfig()
 
-	dbsm := configs.DBConfig["dbms"]
+	dbms := configs.DBConfig["dbms"]
 	dsn := db.BuildDNS(configs.DBConfig)
-	db.Open(dbsm, dsn)
+	db.Open(dbms, dsn)
 	defer db.Close()
 
 	server.Open(configs.ServerConfig["port"])
