@@ -7,7 +7,7 @@ services:
         ports: # ホストOSのポートとコンテナのポートをつなげる 
             - "8080:8080"
         volumes:
-            - ./app:/go/src/app # マウントディレクトリ
+            - ./src:/go/src/app # マウントディレクトリ
 
     postgres:
         image: postgres:latest

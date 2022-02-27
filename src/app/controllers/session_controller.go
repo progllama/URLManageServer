@@ -1,12 +1,18 @@
+package controllers
 
-func (_ AuthController) CreateSession(c *gin.Context) {
+import (
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin"
+)
+
+func CreateSession(c *gin.Context) {
 }
 
-func (_ AuthController) DestroySession(c *gin.Context) {
+func DestroySession(c *gin.Context) {
 	c.Redirect(302, "/users")
 }
 
-func (_ AuthController) SessionCheck(c *gin.Context) {
+func SessionCheck(c *gin.Context) {
 	session := sessions.Default(c)
 	uid := session.Get("UserId")
 

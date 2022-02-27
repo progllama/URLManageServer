@@ -1,8 +1,8 @@
-package repository
+package repositories
 
 import (
+	"url_manager/app/models"
 	"url_manager/db"
-	"url_manager/model"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -11,7 +11,7 @@ import (
 
 type UserRepository struct{}
 
-type User model.User
+type User models.User
 
 type UserProfile struct {
 	Name string
@@ -73,9 +73,9 @@ func (_ UserRepository) GetByName(name string) UserProfile {
 }
 
 // UpdateByID is update a User
-func (_ UserRepository) UpdateByID(id int, c *gin.Context) (model.User, error) {
+func (_ UserRepository) UpdateByID(id int, c *gin.Context) (models.User, error) {
 	db := db.GetDB()
-	var user model.User
+	var user models.User
 	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
 		return user, err
 	}

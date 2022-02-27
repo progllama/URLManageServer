@@ -1,10 +1,9 @@
-package controller
+package controllers
 
 import (
 	"net/http"
 	"strconv"
-
-	"url_manager/model/repository"
+	"url_manager/app/models/repositories"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +13,7 @@ type UserController struct{}
 
 // Index action: GET /users
 func (_ UserController) Index(c *gin.Context) {
-	var u repository.UserRepository
+	var u repositories.UserRepository
 	_, err := u.GetAll()
 	if err != nil {
 		c.AbortWithStatus(404)
@@ -26,7 +25,7 @@ func (_ UserController) Index(c *gin.Context) {
 
 // Create action: POST /users
 func (_ UserController) Create(c *gin.Context) {
-	var u repository.UserRepository
+	var u repositories.UserRepository
 	p, err := u.CreateModel(c)
 
 	if err != nil {
@@ -40,7 +39,7 @@ func (_ UserController) Create(c *gin.Context) {
 // Show action: Get /users/:id
 func (_ UserController) Show(c *gin.Context) {
 	id := c.Params.ByName("id")
-	var u repository.UserRepository
+	var u repositories.UserRepository
 	idInt, _ := strconv.Atoi(id)
 	user, err := u.GetByID(idInt)
 
@@ -55,7 +54,7 @@ func (_ UserController) Show(c *gin.Context) {
 // Update action: Put /users/:id
 func (_ UserController) Update(c *gin.Context) {
 	id := c.Params.ByName("id")
-	var u repository.UserRepository
+	var u repositories.UserRepository
 	idInt, _ := strconv.Atoi(id)
 	p, err := u.UpdateByID(idInt, c)
 
@@ -70,7 +69,7 @@ func (_ UserController) Update(c *gin.Context) {
 // Delete action: DELETE /users/:id
 func (_ UserController) Delete(c *gin.Context) {
 	id := c.Params.ByName("id")
-	var u repository.UserRepository
+	var u repositories.UserRepository
 	idInt, _ := strconv.Atoi(id)
 	if err := u.DeleteByID(idInt); err != nil {
 		c.AbortWithStatus(403)
