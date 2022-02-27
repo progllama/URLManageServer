@@ -6,8 +6,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var Config map[string]string = make(map[string]string)
-
 func LoadConfig() {
 	loadDotEnv()
 	loadDBConfig()
@@ -15,6 +13,6 @@ func LoadConfig() {
 }
 
 func loadDotEnv() {
-	err := godotenv.Load()
+	err := godotenv.Load(".env")
 	utils.PanicIfError(err)
 }

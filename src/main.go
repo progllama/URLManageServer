@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"url_manager/configs"
 	"url_manager/db"
 	"url_manager/server"
@@ -9,8 +10,9 @@ import (
 func main() {
 	configs.LoadConfig()
 
-	dbsm := configs.Config["dbsm"]
-	dsn := db.BuildDNS(configs.Config)
+	dbsm := configs.DBConfig["dbms"]
+	dsn := db.BuildDNS(configs.DBConfig)
+	fmt.Println(dsn)
 	db.Open(dbsm, dsn)
 	defer db.Close()
 

@@ -4,6 +4,7 @@ import (
 	"url_manager/utils"
 
 	"github.com/jinzhu/gorm"
+	_ "github.com/lib/pq"
 )
 
 var (

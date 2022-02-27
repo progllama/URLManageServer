@@ -10,7 +10,7 @@ import (
 
 func Open(port string) {
 	router := gin.Default()
-	router.LoadHTMLGlob("template/*.tmpl")
+	router.LoadHTMLGlob("app/templates/*.tmpl")
 
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("mysession", store))
