@@ -1,6 +1,7 @@
 package db
 
 import (
+	"url_manager/app/models"
 	"url_manager/utils"
 
 	"github.com/jinzhu/gorm"
@@ -24,4 +25,8 @@ func Open(database string, dsn string) {
 func Close() {
 	err = db.Close()
 	utils.PanicIfError(err)
+}
+
+func Migrate() {
+	db.AutoMigrate(&models.User{})
 }

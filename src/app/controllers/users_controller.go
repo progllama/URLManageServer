@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"math"
 	"net/http"
 	"strconv"
 	"url_manager/app/models/repositories"
@@ -25,14 +26,16 @@ func (_ UserController) Index(c *gin.Context) {
 
 // Create action: POST /users
 func (_ UserController) Create(c *gin.Context) {
-	var u repositories.UserRepository
-	p, err := u.CreateModel(c)
+	var r repositories.UserRepository
+	u, err := r.CreateModel(c)
 
 	if err != nil {
-		c.AbortWithStatus(400)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Abort()
+		c.SetCookie("sign up result", "fault", math.MaxInt64, "/", c.Request.URL.Hostname(), true, true)
+		c.SetCookie("fault reason", "duplicated user name", math.MaxInt64, "/", c.Request.URL.Hostname(), true, true)
+		c.Redirect(303, "sign_up")
 	} else {
-		c.Redirect(302, "/users/"+strconv.Itoa(int(p.ID)))
+		c.Redirect(302, "/users/"+strconv.Itoa(int(u.ID)))
 	}
 }
 

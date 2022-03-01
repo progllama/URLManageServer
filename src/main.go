@@ -12,6 +12,7 @@ func main() {
 	dbms := configs.DBConfig["dbms"]
 	dsn := db.BuildDNS(configs.DBConfig)
 	db.Open(dbms, dsn)
+	db.Migrate()
 	defer db.Close()
 
 	server.Open(configs.ServerConfig["port"])
