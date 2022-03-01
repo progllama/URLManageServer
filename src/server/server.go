@@ -10,17 +10,16 @@ import (
 
 func Open(port string) {
 	router := gin.Default()
-	router.LoadHTMLGlob("app/templates/*.tmpl")
 
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("mysession", store))
 
 	{
-		auth_controller := controllers.AuthController{}
-		router.GET("/sign_in", auth_controller.SignIn)
+		// auth_controller := controllers.AuthController{}
+		// router.GET("/sign_in", auth_controller.SignIn)
 		// router.POST("/sign_in", CreateSession)
 		// router.POST("/sign_out", DestroySession)
-		router.GET("/sign_up", auth_controller.SignUp)
+		// router.GET("/sign_up", auth_controller.SignUp)
 	}
 
 	users := router.Group("/users")
