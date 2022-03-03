@@ -2,7 +2,6 @@ package db
 
 import (
 	"url_manager/app/models"
-	"url_manager/utils"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
@@ -19,12 +18,16 @@ func GetDB() *gorm.DB {
 
 func Open(database string, dsn string) {
 	db, err = gorm.Open(database, dsn)
-	utils.PanicIfError(err)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func Close() {
 	err = db.Close()
-	utils.PanicIfError(err)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func Migrate() {

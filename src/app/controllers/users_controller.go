@@ -35,6 +35,7 @@ func (_ UserController) Create(c *gin.Context) {
 		c.SetCookie("fault reason", "duplicated user name", math.MaxInt64, "/", c.Request.URL.Hostname(), true, true)
 		c.Redirect(303, "sign_up")
 	} else {
+		// ログイン処理
 		c.Redirect(302, "/users/"+strconv.Itoa(int(u.ID)))
 	}
 }

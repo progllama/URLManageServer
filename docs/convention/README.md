@@ -72,6 +72,15 @@ hoges_controller
 一般的にコントローラは複数のリソースを扱うので複数形で定義する。
 railsを参考にしました。
 
+コントローラのアクション名
+Index(GET)
+Show(GET)
+New(GET)
+Create(POST)
+Edit(GET)
+UPDATE(POST)
+DESTROY(POST)
+
 ### モデル名
 hoge
 hogeが表すのは単体のデータなので単数形で定義する。

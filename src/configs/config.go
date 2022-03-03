@@ -1,8 +1,6 @@
 package configs
 
 import (
-	"url_manager/utils"
-
 	"github.com/joho/godotenv"
 )
 
@@ -14,5 +12,8 @@ func LoadConfig() {
 
 func loadDotEnv() {
 	err := godotenv.Load(".env")
-	utils.PanicIfError(err)
+
+	if err != nil {
+		panic(err)
+	}
 }

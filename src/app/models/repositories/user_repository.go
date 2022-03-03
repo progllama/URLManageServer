@@ -12,6 +12,10 @@ import (
 type UserRepository struct{}
 
 type User models.User
+type SafeUser struct {
+	Name string
+	ID   int
+}
 
 type UserProfile struct {
 	Name string
@@ -52,24 +56,25 @@ func (_ UserRepository) CreateModel(c *gin.Context) (User, error) {
 }
 
 // GetByID is get a User by ID
-func (_ UserRepository) GetByID(id int) (UserProfile, error) {
+func (_ UserRepository) GetByID(id int) (SafeUser, error) {
 	db := db.GetDB()
-	var user_profile UserProfile
-	if err := db.Table("users").Where("id = ?", id).First(&user_profile).Error; err != nil {
-		return user_profile, err
+	var user SafeUser
+	if err := db.Table("users").Where("id = ?", id).First(&user).Error; err != nil {
+		return user, err
 	}
-	db.Table("users").Where("id = ?", id).First(&user_profile)
+	db.Table("users").Where("id = ?", id).First(&user)
 
-	return user_profile, nil
+	return user, nil
 }
 
-func (_ UserRepository) GetByName(name string) UserProfile {
+func (_ UserRepository) GetByName(name string) SafeUser {
 	db := db.GetDB()
-	var user_profile UserProfile
-	if err := db.Table("users").Where("name=?", name).First(&user_profile).Error; err != nil {
-		return user_profile
+	var user SafeUser
+
+	if err := db.Table("users").Where("name=?", name).First(&user).Error; err != nil {
+		return user
 	}
-	return user_profile
+	return user
 }
 
 // UpdateByID is update a User

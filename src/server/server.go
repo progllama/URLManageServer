@@ -4,23 +4,22 @@ import (
 	"url_manager/app/controllers"
 
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 )
 
 func Open(port string) {
 	router := gin.Default()
 
-	store := cookie.NewStore([]byte("secret"))
-	router.Use(sessions.Sessions("mysession", store))
+	// TODO エラーハンドリング追加
+	store, _ := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("32bytes-secret-auth-key"))
+	router.Use(sessions.Sessions("URLManager", store))
 
-	{
-		// auth_controller := controllers.AuthController{}
-		// router.GET("/sign_in", auth_controller.SignIn)
-		// router.POST("/sign_in", CreateSession)
-		// router.POST("/sign_out", DestroySession)
-		// router.GET("/sign_up", auth_controller.SignUp)
-	}
+	// auth_controller := controllers.AuthController{}
+	// router.GET("/sign_in", auth_controller.SignIn)
+	// router.POST("/sign_in", CreateSession)
+	// router.POST("/sign_out", DestroySession)
+	// router.GET("/sign_up", auth_controller.SignUp)
 
 	users := router.Group("/users")
 	{

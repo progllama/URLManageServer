@@ -7,15 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RequireLogin(c *gin.Context) {
-	session := sessions.Default(c)
-	uid := session.Get("UserId")
+func RequireLogin() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		session := sessions.Default(c)
+		uid := session.Get("UserId")
 
-	if uid == nil {
-		c.JSON(http.StatusUnauthorized, gin.H{})
-		c.Abort()
-	} else {
-		c.Set("UserId", uid)
-		c.Next()
+		if uid == nil {
+			c.JSON(http.StatusUnauthorized, gin.H{})
+			c.Abort()
+		} else {
+			c.Set("UserId", uid)
+			c.Next()
+		}
 	}
 }
