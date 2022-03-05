@@ -1,86 +1,90 @@
 package controllers
 
 import (
-	"math"
 	"net/http"
 	"strconv"
 	"url_manager/app/models/repositories"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-// Controller is user controlller
-type UserController struct{}
-
-// Index action: GET /users
-func (_ UserController) Index(c *gin.Context) {
-	var u repositories.UserRepository
-	_, err := u.GetAll()
+func ShowUsers(c *gin.Context) {
+	var repo repositories.UserRepository
+	users, err := repo.GetAll()
 	if err != nil {
-		c.AbortWithStatus(404)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{})
-	}
-}
-
-// Create action: POST /users
-func (_ UserController) Create(c *gin.Context) {
-	var r repositories.UserRepository
-	u, err := r.CreateModel(c)
-
-	if err != nil {
 		c.Abort()
-		c.SetCookie("sign up result", "fault", math.MaxInt64, "/", c.Request.URL.Hostname(), true, true)
-		c.SetCookie("fault reason", "duplicated user name", math.MaxInt64, "/", c.Request.URL.Hostname(), true, true)
-		c.Redirect(303, "sign_up")
 	} else {
-		// ログイン処理
-		c.Redirect(302, "/users/"+strconv.Itoa(int(u.ID)))
+		c.JSON(http.StatusOK, users)
 	}
 }
 
-// Show action: Get /users/:id
-func (_ UserController) Show(c *gin.Context) {
-	id := c.Params.ByName("id")
+func ShowUser(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	if uint(id) != sessions.Default(c).Get("uid") {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong id or not logged in."})
+		return
+	}
+
 	var u repositories.UserRepository
-	idInt, _ := strconv.Atoi(id)
-	user, err := u.GetByID(idInt)
+	uid, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		return
+	}
+	user, err := u.GetByID(uid)
 
 	if err != nil {
 		c.AbortWithStatus(400)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.HTML(http.StatusOK, "user_show.tmpl", gin.H{"name": user.Name})
+		c.JSON(http.StatusOK, gin.H{"name": user.Name, "id": user.ID})
 	}
 }
 
-// Update action: Put /users/:id
-func (_ UserController) Update(c *gin.Context) {
-	id := c.Params.ByName("id")
-	var u repositories.UserRepository
-	idInt, _ := strconv.Atoi(id)
-	p, err := u.UpdateByID(idInt, c)
+func CreateUser(c *gin.Context) {
+	var repo repositories.UserRepository
+	// TODO gin.Contextへの依存がレポジトリにも発生しているのでこれをよしとしていくか
+	//      依存しない方向でいくか。
+	u, err := repo.CreateModel(c)
 
 	if err != nil {
-		c.AbortWithStatus(404)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusOK, gin.H{})
 	} else {
-		c.JSON(200, p)
+		// TODO session コントローラのログイン処理とまとめる
+		s := sessions.Default(c)
+		s.Set("uid", u.ID)
+		s.Save()
 	}
 }
 
-// Delete action: DELETE /users/:id
-func (_ UserController) Delete(c *gin.Context) {
-	id := c.Params.ByName("id")
-	var u repositories.UserRepository
-	idInt, _ := strconv.Atoi(id)
-	if err := u.DeleteByID(idInt); err != nil {
-		c.AbortWithStatus(403)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+// // Update action: Put /users/:id
+// func (_ UserController) Update(c *gin.Context) {
+// 	id := c.Params.ByName("id")
+// 	var u repositories.UserRepository
+// 	idInt, _ := strconv.Atoi(id)
+// 	p, err := u.UpdateByID(idInt, c)
 
-	c.JSON(200, gin.H{"success": "ID" + id + "Deleted"})
-	return
-}
+// 	if err != nil {
+// 		c.AbortWithStatus(404)
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// 	} else {
+// 		c.JSON(200, p)
+// 	}
+// }
+
+// // Delete action: DELETE /users/:id
+// func (_ UserController) Delete(c *gin.Context) {
+// 	id := c.Params.ByName("id")
+// 	var u repositories.UserRepository
+// 	idInt, _ := strconv.Atoi(id)
+// 	if err := u.DeleteByID(idInt); err != nil {
+// 		c.AbortWithStatus(403)
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	c.JSON(200, gin.H{"success": "ID" + id + "Deleted"})
+// 	return
+// }

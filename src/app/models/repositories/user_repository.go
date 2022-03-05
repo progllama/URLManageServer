@@ -12,24 +12,17 @@ import (
 type UserRepository struct{}
 
 type User models.User
-type SafeUser struct {
-	Name string
-	ID   int
-}
 
-type UserProfile struct {
-	Name string
-	Id   int
-}
+// Userをそのまま返しているのでテーブル構造がバレてしまう。
 
 // GetAll is get all User
-func (_ UserRepository) GetAll() ([]UserProfile, error) {
+func (_ UserRepository) GetAll() ([]User, error) {
 	db := db.GetDB()
-	var user_profiles []UserProfile
-	if err := db.Table("users").Select("name, id").Scan(&user_profiles).Error; err != nil {
+	var user []User
+	if err := db.Table("users").Select("name, id").Scan(&user).Error; err != nil {
 		return nil, err
 	}
-	return user_profiles, nil
+	return user, nil
 }
 
 // CreateModel is create User model
@@ -56,9 +49,9 @@ func (_ UserRepository) CreateModel(c *gin.Context) (User, error) {
 }
 
 // GetByID is get a User by ID
-func (_ UserRepository) GetByID(id int) (SafeUser, error) {
+func (_ UserRepository) GetByID(id int) (User, error) {
 	db := db.GetDB()
-	var user SafeUser
+	var user User
 	if err := db.Table("users").Where("id = ?", id).First(&user).Error; err != nil {
 		return user, err
 	}
@@ -67,14 +60,14 @@ func (_ UserRepository) GetByID(id int) (SafeUser, error) {
 	return user, nil
 }
 
-func (_ UserRepository) GetByName(name string) SafeUser {
+func (_ UserRepository) GetByName(name string) (User, error) {
 	db := db.GetDB()
-	var user SafeUser
+	var user User
 
 	if err := db.Table("users").Where("name=?", name).First(&user).Error; err != nil {
-		return user
+		return user, err
 	}
-	return user
+	return user, nil
 }
 
 // UpdateByID is update a User

@@ -1,13 +1,13 @@
-version: "3" # composeファイルのバージョン
+version: "3"
 
 services: 
-    app: # サービス名
-        build: . # ビルドに使うDockerfileの場所
-        tty: true # コンテナの永続化
-        ports: # ホストOSのポートとコンテナのポートをつなげる 
+    app: 
+        build: . 
+        tty: true
+        ports:
             - "8080:8080"
         volumes:
-            - ./src:/go/src/app # マウントディレクトリ
+            - ./src:/go/src/app
 
     postgres:
         image: postgres:latest
@@ -15,3 +15,10 @@ services:
         env_file: db.env
         ports:
         - 5432:5432
+
+    redis:
+        image: "redis:latest"
+        ports:
+        - 6379:6379
+        volumes:
+        - ./data/redis:/data

@@ -2,6 +2,7 @@ package server
 
 import (
 	"url_manager/app/controllers"
+	"url_manager/app/middlewares"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
@@ -12,27 +13,17 @@ func Open(port string) {
 	router := gin.Default()
 
 	// TODO エラーハンドリング追加
-	store, _ := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("32bytes-secret-auth-key"))
+	store, _ := redis.NewStore(10, "tcp", "redis:6379", "", []byte("32bytes-secret-auth-key"))
 	router.Use(sessions.Sessions("URLManager", store))
 
-	// auth_controller := controllers.AuthController{}
-	// router.GET("/sign_in", auth_controller.SignIn)
-	// router.POST("/sign_in", CreateSession)
-	// router.POST("/sign_out", DestroySession)
-	// router.GET("/sign_up", auth_controller.SignUp)
+	router.POST("/sign_in", controllers.CreateSession)
+	router.DELETE("/sign_out", controllers.DestroySession)
 
 	users := router.Group("/users")
 	{
-		user_controller := controllers.UserController{}
-		// auth_controller := controllers.AuthController{}
-
-		// users.Use(auth_controller.SessionCheck)
-
-		users.GET("", user_controller.Index)
-		users.POST("", user_controller.Create)
-		users.GET("/:id", user_controller.Show)
-		// users.PUT("/:id", user_controller.Update)
-		// users.DELETE("/:id", user_controller.Delete)
+		users.GET("", controllers.ShowUsers)
+		users.POST("", controllers.CreateUser)
+		users.GET("/:id", middlewares.RequireLogin(), controllers.ShowUser)
 	}
 
 	router.Run(":8080")
