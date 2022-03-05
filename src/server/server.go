@@ -12,8 +12,10 @@ import (
 func Open(port string) {
 	router := gin.Default()
 
-	// TODO エラーハンドリング追加
-	store, _ := redis.NewStore(10, "tcp", "redis:6379", "", []byte("32bytes-secret-auth-key"))
+	store, err := redis.NewStore(10, "tcp", "redis:6379", "", []byte("32bytes-secret-auth-key"))
+	if err != nil {
+		panic(err)
+	}
 	router.Use(sessions.Sessions("URLManager", store))
 
 	router.POST("/sign_in", controllers.CreateSession)
