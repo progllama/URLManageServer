@@ -9,12 +9,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// TODO
-// ログインできるか確認。 canLogin
-// 本人確認 authenticate
-// ログイン login
-// ログアウト logout
-
 func CreateSession(c *gin.Context) {
 	var loginParameter struct {
 		Name     string
@@ -26,29 +20,48 @@ func CreateSession(c *gin.Context) {
 	}
 
 	session := sessions.Default(c)
-	if session.Get("uid") != nil {
+	if IsLoggedIn(session) {
 		c.JSON(http.StatusOK, gin.H{})
 		return
 	}
 
 	u, err := repositories.UserRepository{}.GetByName(loginParameter.Name)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-		return
-	}
-	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(loginParameter.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+	if Authenticate(u.Name, u.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{})
 		return
 	}
 
-	session.Set("uid", u.ID)
+	Login(session, u.ID)
 
 	c.JSON(http.StatusOK, gin.H{"result": "success"})
 }
 
+func IsLoggedIn(s sessions.Session) bool {
+	return s.Get("uid") != nil
+}
+
+func Authenticate(name string, password string) bool {
+	u, err := repositories.UserRepository{}.GetByName(name)
+	if err != nil {
+		return false
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); err != nil {
+		return false
+	}
+	return true
+}
+
+func Login(s sessions.Session, id uint) {
+	s.Set("uid", id)
+}
+
 func DestroySession(c *gin.Context) {
 	session := sessions.Default(c)
-	session.Clear()
-	session.Save()
+	Logout(session)
 	c.JSON(http.StatusOK, gin.H{})
+}
+
+func Logout(s sessions.Session) {
+	s.Clear()
+	s.Save()
 }
