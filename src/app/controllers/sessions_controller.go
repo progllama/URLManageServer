@@ -17,6 +17,7 @@ func CreateSession(c *gin.Context) {
 	err := c.BindJSON(&loginParameter)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		return
 	}
 
 	session := sessions.Default(c)
