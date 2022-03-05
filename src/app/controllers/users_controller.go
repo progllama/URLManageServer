@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 	"strconv"
-	"url_manager/app/models/repositories"
+	"url_manager/app/repositories"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
