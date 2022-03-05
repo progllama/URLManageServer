@@ -24,6 +24,8 @@ func Open(port string) {
 		users.GET("", controllers.ShowUsers)
 		users.POST("", controllers.CreateUser)
 		users.GET("/:id", middlewares.RequireLogin(), controllers.ShowUser)
+		users.PUT("/:id", middlewares.RequireLogin(), controllers.UpdateUser)
+		users.DELETE("/:id", middlewares.RequireLogin(), controllers.DeleteUser)
 	}
 
 	router.Run(":8080")

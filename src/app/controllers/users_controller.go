@@ -59,32 +59,38 @@ func CreateUser(c *gin.Context) {
 	}
 }
 
-// // Update action: Put /users/:id
-// func (_ UserController) Update(c *gin.Context) {
-// 	id := c.Params.ByName("id")
-// 	var u repositories.UserRepository
-// 	idInt, _ := strconv.Atoi(id)
-// 	p, err := u.UpdateByID(idInt, c)
+func UpdateUser(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	if uint(id) != sessions.Default(c).Get("uid") {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong id or not logged in."})
+		return
+	}
 
-// 	if err != nil {
-// 		c.AbortWithStatus(404)
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// 	} else {
-// 		c.JSON(200, p)
-// 	}
-// }
+	uid, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		return
+	}
+	user, err := repositories.UserRepository{}.UpdateByID(uid, c)
 
-// // Delete action: DELETE /users/:id
-// func (_ UserController) Delete(c *gin.Context) {
-// 	id := c.Params.ByName("id")
-// 	var u repositories.UserRepository
-// 	idInt, _ := strconv.Atoi(id)
-// 	if err := u.DeleteByID(idInt); err != nil {
-// 		c.AbortWithStatus(403)
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// 		return
-// 	}
+	if err != nil {
+		c.AbortWithStatus(400)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"name": user.Name, "id": user.ID})
+	}
+}
 
-// 	c.JSON(200, gin.H{"success": "ID" + id + "Deleted"})
-// 	return
-// }
+func DeleteUser(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Params.ByName("id"))
+
+	var u repositories.UserRepository
+	if err := u.DeleteByID(id); err != nil {
+		c.AbortWithStatus(403)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"success": "ID" + strconv.Itoa(id) + "Deleted"})
+	return
+}
