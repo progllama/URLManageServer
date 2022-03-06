@@ -13,6 +13,12 @@ type UserController struct {
 	urepo repositories.IUserRepository
 }
 
+func NewUserController(urepo repositories.UserRepository) UserController {
+	return UserController{
+		urepo,
+	}
+}
+
 func (ctrl *UserController) CreateSession(ctx *gin.Context) {
 	var loginParameter struct {
 		Name     string
@@ -30,7 +36,7 @@ func (ctrl *UserController) CreateSession(ctx *gin.Context) {
 		return
 	}
 
-	u, err := repositories.UserRepository{}.GetByName(loginParameter.Name)
+	u, err := ctrl.urepo.GetByName(loginParameter.Name)
 	if Authenticate(u.Name, u.Password) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{})
 		return
