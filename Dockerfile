@@ -12,6 +12,11 @@ ADD . /go/src/app
 RUN go get -u github.com/gin-gonic/gin && \
   go get github.com/jinzhu/gorm && \
   go get github.com/jinzhu/gorm/dialects/postgres
+  # go get -u github.com/golang/mock/gomock && \
+  # go get -u github.com/golang/mock/mockgen && \
+  # go get -u github.com/google/wire/cmd/wire 
+
+# ENV PATH $PATH:$HOME/go/bin
 
 RUN go get -u github.com/oxequa/realize 
 CMD ["realize", "start"]
