@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"net/http"
-	"url_manager/app/repositories"
+	"url_manager/app/models/repositories"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
