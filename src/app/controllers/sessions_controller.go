@@ -9,36 +9,32 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserController struct {
-	urepo repositories.IUserRepository
-}
-
-func (ctrl *UserController) CreateSession(ctx *gin.Context) {
+func CreateSession(c *gin.Context) {
 	var loginParameter struct {
 		Name     string
 		Password string
 	}
-	err := ctx.BindJSON(&loginParameter)
+	err := c.BindJSON(&loginParameter)
 	if err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
 		return
 	}
 
-	session := sessions.Default(ctx)
+	session := sessions.Default(c)
 	if IsLoggedIn(session) {
-		ctx.JSON(http.StatusOK, gin.H{})
+		c.JSON(http.StatusOK, gin.H{})
 		return
 	}
 
 	u, err := repositories.UserRepository{}.GetByName(loginParameter.Name)
 	if Authenticate(u.Name, u.Password) {
-		ctx.JSON(http.StatusUnauthorized, gin.H{})
+		c.JSON(http.StatusUnauthorized, gin.H{})
 		return
 	}
 
 	Login(session, u.ID)
 
-	ctx.JSON(http.StatusOK, gin.H{"result": "success"})
+	c.JSON(http.StatusOK, gin.H{"result": "success"})
 }
 
 func IsLoggedIn(s sessions.Session) bool {

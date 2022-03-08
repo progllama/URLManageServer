@@ -16,7 +16,7 @@ type preferResponse struct {
 	body map[string]interface{}
 }
 
-func TestCreateUser(t *testing.T) {
+func TestCreateUserAction(t *testing.T) {
 
 	tests := []struct {
 		user models.User
@@ -25,12 +25,14 @@ func TestCreateUser(t *testing.T) {
 		{
 			//①: テーブルにレコードが何もない状態で作成するユーザ（コンフリクトは起きないはず）
 			models.User{
+				Email:    "test@example.com",
 				Password: "test password",
 				Name:     "test name",
 			},
 			preferResponse{
 				code: http.StatusCreated,
 				body: map[string]interface{}{
+					"Email":    "test@example.com",
 					"Password": "test password", //パスワードも調査した方が良いが、データベース内ではhash化されるため
 					"Name":     "test name",
 				},
@@ -39,6 +41,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			//②: メールアドレスがかぶっているユーザ
 			models.User{
+				Email:    "test@example.com",
 				Password: "test password",
 				Name:     "test name",
 			},
@@ -54,11 +57,7 @@ func TestCreateUser(t *testing.T) {
 
 		//テスト準備
 		//リクエストを作成
-		requestBody := strings.NewReader(`{
-	"Name": "test"
-	"Password": "password"
-}
-`)
+		requestBody := strings.NewReader("Email=" + tt.user.Email + "&Name=" + tt.user.Name + "&Password=" + tt.user.Password)
 		//レスポンス
 		//ここに帰ってくる
 		response := httptest.NewRecorder()
