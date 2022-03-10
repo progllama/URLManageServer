@@ -9,4 +9,5 @@ type User struct {
 	Name     string `json:"name" binding:"required" gorm:"unique;not null"`
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required" gorm:"size:100"`
+	URLs     []URL  `json:"urls" gorm:"foreignkey:UserID"`
 }
