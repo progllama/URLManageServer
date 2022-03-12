@@ -2,3 +2,4 @@
 psql.env
 *.env
 data/redis
+.vagrant

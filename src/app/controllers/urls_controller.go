@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 	"url_manager/app/models"
 	"url_manager/app/models/repositories"
 
@@ -12,19 +13,28 @@ func ShowURLs(c *gin.Context) {
 	var url models.URL
 	c.BindJSON(&url)
 
-	var r repositories.URLRepository
+	r := repositories.DefaultURLRepositoryImpl{}
 
-	_, err := r.Create(url)
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"err": err})
+	}
+	urls, err := r.GetByUserID(id)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"err": err})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusOK, gin.H{"urls": urls})
 }
 
 func ShowURL(c *gin.Context) {
+	var url models.URL
+	c.BindJSON(&url)
 
+	var r repositories.URLRepository
+
+	err := r.Create(url)
 }
 
 func CreateURL(c *gin.Context) {
