@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
+	"url_manager/app/models"
 	"url_manager/app/models/repositories"
 
 	"github.com/gin-contrib/sessions"
@@ -35,28 +37,72 @@ func ShowUser(c *gin.Context) {
 	}
 	user, err := u.GetByID(uid)
 
+	urlrepo := repositories.DefaultURLRepositoryImpl{}
+	urls, err := urlrepo.GetByUserID(uid)
+
+	safeUrls := make([]SafeURL, len(urls))
+
+	for i, v := range urls {
+		safeUrls[i] = SafeURL{
+			v.Title,
+			v.URL,
+		}
+	}
+
 	if err != nil {
 		c.AbortWithStatus(400)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"name": user.Name, "id": user.ID})
+		c.HTML(http.StatusOK, "user_show.html", gin.H{"name": user.Name, "id": user.ID, "urls": safeUrls})
 	}
 }
 
+type SafeURL struct {
+	Title string
+	Url   string
+}
+
+func NewUser(c *gin.Context) {
+	c.HTML(http.StatusOK, "user_new.html", gin.H{})
+}
+
 func CreateUser(c *gin.Context) {
-	var repo repositories.UserRepository
-	// TODO gin.Contextへの依存がレポジトリにも発生しているのでこれをよしとしていくか
-	//      依存しない方向でいくか。
-	u, err := repo.CreateModel(c)
+	c.Request.ParseForm()
+	name := c.Request.FormValue("name")
+	password := c.Request.FormValue("password")
+
+	r := repositories.UserRepository{}
+	_, err := r.Exists(name)
+	if err != nil {
+		fmt.Println(err)
+		c.Redirect(302, "/users/new")
+		c.Abort()
+		return
+	}
+
+	err = r.Create(models.User{
+		Name:     name,
+		Password: password,
+	})
 
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{})
-	} else {
-		// TODO session コントローラのログイン処理とまとめる
-		s := sessions.Default(c)
-		s.Set("uid", u.ID)
-		s.Save()
+		fmt.Println(err)
+		c.Redirect(302, "/users")
+		c.Abort()
+		return
 	}
+
+	u, err := r.GetByName(name)
+
+	sessoin := sessions.Default(c)
+	Login(sessoin, u.ID)
+
+	c.Redirect(302, "/login")
+	c.Abort()
+}
+
+func EditUser(c *gin.Context) {
+
 }
 
 func UpdateUser(c *gin.Context) {

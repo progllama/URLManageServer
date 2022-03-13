@@ -25,6 +25,23 @@ func (_ UserRepository) GetAll() ([]User, error) {
 	return user, nil
 }
 
+func (self UserRepository) Create(user models.User) error {
+	db := db.GetDB()
+
+	hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12) // 2 ^ 12 回　ストレッチ回数
+
+	if err != nil {
+		return err
+	}
+
+	user.Password = string(hashedPass)
+
+	if err := db.Create(&user).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 // CreateModel is create User model
 func (_ UserRepository) CreateModel(c *gin.Context) (User, error) {
 	db := db.GetDB()
@@ -68,6 +85,13 @@ func (_ UserRepository) GetByName(name string) (User, error) {
 		return user, err
 	}
 	return user, nil
+}
+
+func (self UserRepository) Exists(name string) (bool, error) {
+	db := db.GetDB()
+	var users []models.User
+	err := db.Select("count(*) > 0").Where("name=?", name).Limit(1).Find(&users).Error
+	return len(users) > 0, err
 }
 
 // UpdateByID is update a User

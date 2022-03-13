@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 	"url_manager/app/models/repositories"
 
 	"github.com/gin-contrib/sessions"
@@ -9,51 +11,60 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func NewSession(c *gin.Context) {
+	c.HTML(http.StatusOK, "login.html", gin.H{})
+}
+
 func CreateSession(c *gin.Context) {
-	var loginParameter struct {
-		Name     string
-		Password string
-	}
-	err := c.BindJSON(&loginParameter)
+	c.Request.ParseForm()
+	name := c.Request.FormValue("userId")
+	password := c.Request.FormValue("password")
+
+	var err error
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
 		return
 	}
 
+	fmt.Println(name, password)
+
 	session := sessions.Default(c)
-	if IsLoggedIn(session) {
-		c.JSON(http.StatusOK, gin.H{})
+	// if IsLoggedIn(session) {
+	// 	c.JSON(http.StatusOK, gin.H{"err": "already login"})
+	// 	return
+	// }
+
+	if Authenticate(name, password) != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err})
 		return
 	}
 
-	u, err := repositories.UserRepository{}.GetByName(loginParameter.Name)
-	if Authenticate(u.Name, u.Password) {
-		c.JSON(http.StatusUnauthorized, gin.H{})
-		return
-	}
-
+	u, err := repositories.UserRepository{}.GetByName(name)
 	Login(session, u.ID)
 
-	c.JSON(http.StatusOK, gin.H{"result": "success"})
+	c.Redirect(302, "/users/"+strconv.Itoa(int(u.ID)))
 }
 
 func IsLoggedIn(s sessions.Session) bool {
 	return s.Get("uid") != nil
 }
 
-func Authenticate(name string, password string) bool {
+func Authenticate(name string, password string) error {
 	u, err := repositories.UserRepository{}.GetByName(name)
+
+	fmt.Println(u, err)
 	if err != nil {
-		return false
+		return err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); err != nil {
-		return false
+		return err
 	}
-	return true
+	return nil
 }
 
 func Login(s sessions.Session, id uint) {
 	s.Set("uid", id)
+	s.Save()
 }
 
 func DestroySession(c *gin.Context) {

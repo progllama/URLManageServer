@@ -1,43 +1,55 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"url_manager/app/models"
 	"url_manager/app/models/repositories"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
 func ShowURLs(c *gin.Context) {
-	var url models.URL
-	c.BindJSON(&url)
 
-	r := repositories.DefaultURLRepositoryImpl{}
-
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"err": err})
-	}
-	urls, err := r.GetByUserID(id)
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"err": err})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"urls": urls})
 }
 
 func ShowURL(c *gin.Context) {
-	var url models.URL
-	c.BindJSON(&url)
 
-	var r repositories.URLRepository
+}
 
-	err := r.Create(url)
+func NewURL(c *gin.Context) {
+	session := sessions.Default(c)
+	id := session.Get("uid")
+
+	c.HTML(http.StatusOK, "url_new.html", gin.H{"id": id})
 }
 
 func CreateURL(c *gin.Context) {
+	session := sessions.Default(c)
+	id := fmt.Sprintf("%d", session.Get("uid"))
+
+	c.Request.ParseForm()
+	title := c.Request.FormValue("title")
+	url := c.Request.FormValue("url")
+
+	intid, _ := strconv.Atoi(id)
+
+	urlModel := models.URL{
+		Title:  title,
+		URL:    url,
+		UserID: uint(intid),
+	}
+
+	r := repositories.DefaultURLRepositoryImpl{}
+	r.Create(urlModel)
+	a, _ := r.GetAll()
+	fmt.Println(a)
+	c.Redirect(302, "/users/"+id)
+}
+
+func EditURL(c *gin.Context) {
 
 }
 

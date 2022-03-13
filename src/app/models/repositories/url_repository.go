@@ -16,6 +16,20 @@ type URLRepository interface {
 type DefaultURLRepositoryImpl struct {
 }
 
+func (self DefaultURLRepositoryImpl) GetAll() ([]models.URL, error) {
+	db := db.GetDB()
+	if db.Error != nil {
+		return []models.URL{}, db.Error
+	}
+
+	var urls []models.URL
+	if err := db.Select("*").Find(&urls).Error; err != nil {
+		return []models.URL{}, err
+	}
+
+	return urls, nil
+}
+
 func (self DefaultURLRepositoryImpl) GetByUserID(id int) ([]models.URL, error) {
 	db := db.GetDB()
 	if db.Error != nil {
@@ -23,7 +37,7 @@ func (self DefaultURLRepositoryImpl) GetByUserID(id int) ([]models.URL, error) {
 	}
 
 	var urls []models.URL
-	if err := db.Select("url, title").Where("UserID=?", id).Find(&urls).Error; err != nil {
+	if err := db.Select("url, title").Where("user_id=?", id).Find(&urls).Error; err != nil {
 		return []models.URL{}, err
 	}
 
