@@ -37,7 +37,7 @@ func (self DefaultURLRepositoryImpl) GetByUserID(id int) ([]models.URL, error) {
 	}
 
 	var urls []models.URL
-	if err := db.Select("url, title").Where("user_id=?", id).Find(&urls).Error; err != nil {
+	if err := db.Select("id, url, title").Where("user_id=?", id).Find(&urls).Error; err != nil {
 		return []models.URL{}, err
 	}
 

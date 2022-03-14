@@ -44,6 +44,7 @@ func ShowUser(c *gin.Context) {
 
 	for i, v := range urls {
 		safeUrls[i] = SafeURL{
+			fmt.Sprintf("%d", v.ID),
 			v.Title,
 			v.URL,
 		}
@@ -58,6 +59,7 @@ func ShowUser(c *gin.Context) {
 }
 
 type SafeURL struct {
+	ID    string
 	Title string
 	Url   string
 }

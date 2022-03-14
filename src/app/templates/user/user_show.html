@@ -7,6 +7,7 @@
         <style type="text/css" media="screen">
             @import url("/css/user_show.css");
         </style>
+        <script type="text/javascript" src="/js/user_show.js"></script>
     </head>
     <body>
         <div class="header-container">
@@ -35,8 +36,8 @@
             {{ range $i, $v := .urls}}
                 <div class="url">
                     <a class="url-link" href="{{ $v.Url }}" target="_blank">{{ $v.Title }}</a>
-                    <button class="btn btn-primary url-button">編集</button>
-                    <button class="btn btn-primary url-button">削除</button>
+                    <button class="btn btn-primary url-button"><a href="/users/{{ $.id }}/urls/{{ $v.ID }}/edit">編集</a></button>
+                    <button class="btn btn-primary url-button" onclick="handleDeleteClicked({{ $.id }}, {{ $v.ID }})">削除</button>
                 </div>
             {{ end }}
         </div>

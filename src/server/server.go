@@ -50,7 +50,7 @@ func Open(port string) {
 		urls.POST("", controllers.CreateURL)
 		// urls.GET("/edit", controllers.EditURL)
 		// urls.PUT("/:id", controllers.UpdateURL)
-		urls.DELETE("/id", controllers.DeleteURL)
+		urls.DELETE("/:id", controllers.DeleteURL)
 	}
 
 	router.Run(":8080")
