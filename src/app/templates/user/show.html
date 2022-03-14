@@ -1,0 +1,14 @@
+{{ define "user/show.html" }}
+{{ template "top" }}
+<h1>{{ .name }}'s Page.</h1>
+<a href="/users/{{ .id }}/urls/new">追加</a>
+<hr>
+{{ range $i, $v := .urls}}
+    <div class="url">
+        <a class="url-link" href="{{ $v.Url }}" target="_blank">{{ $v.Title }}</a>
+        <button class="btn btn-primary url-button"><a href="/users/{{ $.id }}/urls/{{ $v.ID }}/edit">編集</a></button>
+        <button class="btn btn-primary url-button" onclick="handleDeleteClicked({{ $.id }}, {{ $v.ID }})">削除</button>
+    </div>
+{{ end }}
+{{ template "bottom" }}
+{{ end }}

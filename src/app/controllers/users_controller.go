@@ -54,7 +54,7 @@ func ShowUser(c *gin.Context) {
 		c.AbortWithStatus(400)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.HTML(http.StatusOK, "user_show.html", gin.H{"name": user.Name, "id": user.ID, "urls": safeUrls})
+		c.HTML(http.StatusOK, "user/show.html", gin.H{"title": "ShowUser", "name": user.Name, "id": user.ID, "urls": safeUrls})
 	}
 }
 
@@ -65,7 +65,7 @@ type SafeURL struct {
 }
 
 func NewUser(c *gin.Context) {
-	c.HTML(http.StatusOK, "user_new.html", gin.H{})
+	c.HTML(http.StatusOK, "user/new.html", gin.H{"title": "NewUser"})
 }
 
 func CreateUser(c *gin.Context) {

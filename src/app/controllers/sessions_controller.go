@@ -12,7 +12,7 @@ import (
 )
 
 func NewSession(c *gin.Context) {
-	c.HTML(http.StatusOK, "login.html", gin.H{})
+	c.HTML(http.StatusOK, "session/login.html", gin.H{"title": "login"})
 }
 
 func CreateSession(c *gin.Context) {
