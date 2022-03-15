@@ -39,7 +39,7 @@ func CreateURL(c *gin.Context) {
 	urlModel := models.URL{
 		Title:  title,
 		URL:    url,
-		UserID: uint(intid),
+		UserID: intid,
 	}
 
 	r := repositories.DefaultURLRepositoryImpl{}
@@ -58,5 +58,21 @@ func UpdateURL(c *gin.Context) {
 }
 
 func DeleteURL(c *gin.Context) {
+	var url models.URL
+	err := c.BindJSON(&url)
+	fmt.Println(err)
 
+	fmt.Println(url)
+
+	buf := make([]byte, 2048)
+	n, _ := c.Request.Body.Read(buf)
+	b := string(buf[0:n])
+	fmt.Println(b)
+
+	repo := repositories.DefaultURLRepositoryImpl{}
+	err = repo.Destroy(url)
+	fmt.Println(err)
+
+	c.JSON(http.StatusOK, gin.H{})
+	c.Abort()
 }

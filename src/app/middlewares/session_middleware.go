@@ -1,8 +1,6 @@
 package middlewares
 
 import (
-	"net/http"
-
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
@@ -12,9 +10,11 @@ func RequireLogin() gin.HandlerFunc {
 		session := sessions.Default(c)
 		uid := session.Get("uid")
 		if uid == nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"err": "please login."})
+			c.Set("loggsin", false)
+			c.Redirect(302, "/about")
 			c.Abort()
 		} else {
+			c.Set("logsin", true)
 			c.Next()
 		}
 	}

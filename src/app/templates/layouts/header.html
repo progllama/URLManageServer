@@ -1,9 +1,14 @@
 {{ define "header" }}
 <div class="header-container">
 <header>
-<a href="/home">URLManager</a>
-<a href="/login">Login</a>
-<a href="/users/new">Create Acount</a>
+<a href="/about">URLManager</a>
+{{ if .logsin }}
+    <button type="button" onclick="handleLogoutClicked({{ .id }})">Logout</button>
+{{ else }}
+    <a href="/login">Login</a>
+    <a href="/users/new">Create Acount</a>
+{{ end }}
+
 </header>
 </div>
 {{ end }}

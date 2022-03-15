@@ -50,11 +50,19 @@ func ShowUser(c *gin.Context) {
 		}
 	}
 
+	fmt.Println(c.GetBool("logsin"))
+
 	if err != nil {
 		c.AbortWithStatus(400)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.HTML(http.StatusOK, "user/show.html", gin.H{"title": "ShowUser", "name": user.Name, "id": user.ID, "urls": safeUrls})
+		c.HTML(http.StatusOK, "user/show.html", gin.H{
+			"title":  "ShowUser",
+			"name":   user.Name,
+			"id":     user.ID,
+			"urls":   safeUrls,
+			"logsin": c.GetBool("logsin"),
+		})
 	}
 }
 

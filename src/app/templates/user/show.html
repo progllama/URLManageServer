@@ -1,5 +1,5 @@
 {{ define "user/show.html" }}
-{{ template "top" }}
+{{ template "top" . }}
 <h1>{{ .name }}'s Page.</h1>
 <a href="/users/{{ .id }}/urls/new">追加</a>
 <hr>

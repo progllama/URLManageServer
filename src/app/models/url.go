@@ -6,7 +6,7 @@ type URL struct {
 	gorm.Model
 	URL    string `json:"url"`
 	Title  string `json:"title"`
-	UserID uint   `json:"uid"`
+	UserID int    `json:"userId"`
 	// Tag         []Tag    ``
 	// Description string   ``
 	// Memos       []Memo   ``
