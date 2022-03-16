@@ -70,7 +70,7 @@ func Login(s sessions.Session, id uint) {
 func DestroySession(c *gin.Context) {
 	session := sessions.Default(c)
 	Logout(session)
-	c.JSON(http.StatusOK, gin.H{})
+	c.Redirect(302, "/about")
 }
 
 func Logout(s sessions.Session) {

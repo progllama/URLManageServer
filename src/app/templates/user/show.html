@@ -6,9 +6,8 @@
 {{ range $i, $v := .urls}}
     <div class="url">
         <a class="url-link" href="{{ $v.Url }}" target="_blank">{{ $v.Title }}</a>
-        <button class="btn btn-primary url-button"><a href="/users/{{ $.id }}/urls/{{ $v.ID }}/edit">編集</a></button>
-        <button class="btn btn-primary url-button" onclick="handleDeleteClicked({{ $.id }}, {{ $v.ID }})">削除</button>
-    </div>
+        <!-- <button class="btn btn-primary url-button"><a href="/users/{{ $.id }}/urls/{{ $v.ID }}/edit">編集</a></button> -->
+        <a href="/users/{{ $.id }}/urls/{{ $v.ID }}/delete">削除</a>
 {{ end }}
 {{ template "bottom" }}
 {{ end }}

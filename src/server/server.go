@@ -28,7 +28,7 @@ func Open(port string) {
 
 	router.GET("/login", controllers.NewSession)
 	router.POST("/login", controllers.CreateSession)
-	router.DELETE("/logout", controllers.DestroySession)
+	router.GET("/logout", controllers.DestroySession)
 
 	users := router.Group("/users")
 	{
@@ -48,9 +48,9 @@ func Open(port string) {
 		// urls.GET("/:id", controllers.ShowURL)
 		urls.GET("/new", controllers.NewURL)
 		urls.POST("", controllers.CreateURL)
-		// urls.GET("/edit", controllers.EditURL)
-		// urls.PUT("/:id", controllers.UpdateURL)
-		urls.DELETE("/:id", controllers.DeleteURL)
+		// urls.GET("/:url_id/edit", controllers.EditURL)
+		// urls.PUT("/:url_id", controllers.UpdateURL)
+		urls.GET("/:urlID/delete", controllers.DeleteURL)
 	}
 
 	router.Run(":8080")

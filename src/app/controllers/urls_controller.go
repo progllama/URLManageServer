@@ -58,21 +58,16 @@ func UpdateURL(c *gin.Context) {
 }
 
 func DeleteURL(c *gin.Context) {
-	var url models.URL
-	err := c.BindJSON(&url)
-	fmt.Println(err)
-
-	fmt.Println(url)
-
-	buf := make([]byte, 2048)
-	n, _ := c.Request.Body.Read(buf)
-	b := string(buf[0:n])
-	fmt.Println(b)
+	url := models.URL{}
+	id, _ := strconv.Atoi(c.Param("urlID"))
+	url.ID = uint(id)
 
 	repo := repositories.DefaultURLRepositoryImpl{}
-	err = repo.Destroy(url)
-	fmt.Println(err)
+	repo.Destroy(url)
+	fmt.Println(url.ID)
 
-	c.JSON(http.StatusOK, gin.H{})
-	c.Abort()
+	session := sessions.Default(c)
+	userID := fmt.Sprintf("%d", session.Get("uid"))
+
+	c.Redirect(302, "/users/"+userID)
 }
