@@ -1,49 +1,16 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>About</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        <style type="text/css" media="screen">
-            @import url("/css/url_new.css");
-        </style>
-    </head>
-    <body>
-        <div class="header-container">
-            <header>
-                <div class="header-content">
-                    <a href="/about" class="header-logo">
-                        URLManager
-                    </a>
-                    <div class="header-links">
-                        <a href="/users/new">アカウント作成</a>
-                        <a href="/login">ログイン</a>
-                    </div>
-                </div>
-            </header>
-        </div>
-        <h1>
-            New URL
-        </h1>
-        <hr>
+{{ define "urls/new.html" }}
+{{ template "top" }}
+<h1>New URL</h1>
+<hr>
 
-        <form name="new-url" action="/users/{{ .id }}/urls/" method="POST">
-            <label>Title</label>
-            <input type="text" name="title">
-            <label>Url</label>
-            <input type="text" name="url">
-            <input type="submit">
-        </form>
-        
-        <div class="footer-container">
-            <footer>
-                <div class="footer-content">
-                    <a href="/about">About</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </footer>
-        </div>
+<form name="new-url" action="/users/{{ .id }}/urls/" method="POST">
+    <label>Title</label>
+    <input type="text" name="title">
+    <label>Url</label>
+    <input type="text" name="url">
+    <input type="submit">
+</form>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    </body>
-</html>
+
+{{ template "bottom" }}
+{{ end }}

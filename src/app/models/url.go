@@ -4,9 +4,10 @@ import "github.com/jinzhu/gorm"
 
 type URL struct {
 	gorm.Model
-	URL    string `json:"url"`
-	Title  string `json:"title"`
-	UserID int    `json:"userId"`
+	URL        string `json:"url"`
+	Title      string `json:"title"`
+	UserID     int    `json:"userId"`
+	VisitCount int
 	// Tag         []Tag    ``
 	// Description string   ``
 	// Memos       []Memo   ``

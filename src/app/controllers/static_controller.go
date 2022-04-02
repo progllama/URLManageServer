@@ -9,7 +9,8 @@ import (
 
 func About(c *gin.Context) {
 	session := sessions.Default(c)
-	c.HTML(http.StatusOK, "static/about.html", gin.H{"title": "about", "logsin": session.Get("uid")})
+	loggsin := session.Get(("uid")) != nil
+	c.HTML(http.StatusOK, "static/about.html", gin.H{"title": "about", "logsin": loggsin, "id": session.Get(("uid"))})
 }
 
 func Contact(c *gin.Context) {

@@ -23,7 +23,7 @@ func NewURL(c *gin.Context) {
 	session := sessions.Default(c)
 	id := session.Get("uid")
 
-	c.HTML(http.StatusOK, "url_new.html", gin.H{"id": id})
+	c.HTML(http.StatusOK, "urls/new.html", gin.H{"id": id})
 }
 
 func CreateURL(c *gin.Context) {

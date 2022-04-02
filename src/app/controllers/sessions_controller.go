@@ -22,11 +22,9 @@ func CreateSession(c *gin.Context) {
 
 	var err error
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
+		c.Redirect(302, "users/new")
 		return
 	}
-
-	fmt.Println(name, password)
 
 	session := sessions.Default(c)
 	// if IsLoggedIn(session) {
@@ -35,7 +33,7 @@ func CreateSession(c *gin.Context) {
 	// }
 
 	if Authenticate(name, password) != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err})
+		c.Redirect(302, "users/new")
 		return
 	}
 
