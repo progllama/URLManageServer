@@ -5,7 +5,8 @@ import (
 	"net/http"
 	"strconv"
 	"url_manager/app/models"
-	"url_manager/app/models/repositories"
+
+	"url_manager/app/repositories"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -42,7 +43,7 @@ func CreateURL(c *gin.Context) {
 		UserID: intid,
 	}
 
-	r := repositories.DefaultURLRepositoryImpl{}
+	r := repositories.PostgreSQLURLRepository{}
 	r.Create(urlModel)
 	a, _ := r.GetAll()
 	fmt.Println(a)
@@ -62,8 +63,8 @@ func DeleteURL(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("urlID"))
 	url.ID = uint(id)
 
-	repo := repositories.DefaultURLRepositoryImpl{}
-	repo.Destroy(url)
+	repo := repositories.PostgreSQLURLRepository{}
+	repo.Delete(url)
 	fmt.Println(url.ID)
 
 	session := sessions.Default(c)

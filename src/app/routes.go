@@ -1,8 +1,16 @@
 package app
 
-type RouteRegistrator struct {
-}
+// type RouteRegistrator struct {
+// }
 
-func NewRouteRegistrator() *RouteRegistrator {
-	return &RouteRegistrator{}
-}
+// type router interface {
+// 	Register(method string, path string, middleware gin.HandlerFunc, handler func(*gin.Context))
+// }
+
+// func NewRouteRegistrator() *RouteRegistrator {
+// 	return &RouteRegistrator{}
+// }
+
+// func (registrator *RouteRegistrator) Register(router router) {
+// 	router.Register(router)
+// }

@@ -1,0 +1,11 @@
+{{ define "show_users.html" }}
+{{ template "top" . }}
+
+<h1>Users</h1>
+<hr>
+{{ range $i, $v := .users}}
+    {{ $v }}
+{{ end }}
+
+{{ template "bottom" }}
+{{ end }}

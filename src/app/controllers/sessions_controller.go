@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
-	"url_manager/app/models/repositories"
+	"url_manager/app/repositories"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -12,56 +13,75 @@ import (
 )
 
 func NewSession(c *gin.Context) {
-	c.HTML(http.StatusOK, "session/login.html", gin.H{"title": "login"})
+	c.HTML(http.StatusOK, "login.html", gin.H{"title": "login"})
 }
 
-func CreateSession(c *gin.Context) {
-	c.Request.ParseForm()
-	name := c.Request.FormValue("userId")
-	password := c.Request.FormValue("password")
+type LoginForm struct {
+	LoginId  string `form:"login_id"`
+	Password string `form:"password"`
+}
 
-	var err error
-	if err != nil {
-		c.Redirect(302, "users/new")
-		return
-	}
+// type SessionURI struct {
+// 	Id int `uri:"id"`
+// }
+
+func CreateSession(c *gin.Context) {
+	var form LoginForm
+	c.ShouldBind(&form)
+
+	// var uri SessionURI
+	// c.ShouldBind(uri)
+
+	log.Println("Success form binding.")
+	log.Println(form.LoginId)
+	log.Println(form.Password)
+	log.Println("End")
 
 	session := sessions.Default(c)
-	// if IsLoggedIn(session) {
-	// 	c.JSON(http.StatusOK, gin.H{"err": "already login"})
-	// 	return
-	// }
 
-	if Authenticate(name, password) != nil {
-		c.Redirect(302, "users/new")
+	if Authenticate(form.LoginId, form.Password) != nil {
+		log.Println("Fail to authenticate")
+		c.Redirect(http.StatusFound, "/users/new")
 		return
 	}
 
-	u, err := repositories.UserRepository{}.GetByName(name)
-	Login(session, u.ID)
+	log.Println("Success to authenticate")
+
+	repo := repositories.UserRepository{}
+	u, err := repo.FindByLoginId(form.LoginId)
+	if err != nil {
+		log.Println("Fail to findByLoginId")
+		c.Redirect(http.StatusFound, "/users/new")
+		return
+	}
+
+	log.Println("Success to findByLoginId")
+	Login(session, u.LoginId)
 
 	c.Redirect(302, "/users/"+strconv.Itoa(int(u.ID)))
 }
 
-func IsLoggedIn(s sessions.Session) bool {
-	return s.Get("uid") != nil
-}
+func Authenticate(loginId string, password string) error {
 
-func Authenticate(name string, password string) error {
-	u, err := repositories.UserRepository{}.GetByName(name)
+	fmt.Println(loginId)
+	repo := repositories.UserRepository{}
+	u, err := repo.FindByLoginId(loginId)
 
-	fmt.Println(u, err)
+	log.Println(u, err)
+
 	if err != nil {
 		return err
 	}
+
 	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func Login(s sessions.Session, id uint) {
-	s.Set("uid", id)
+func Login(s sessions.Session, loginId string) {
+	s.Set("login_id", loginId)
 	s.Save()
 }
 

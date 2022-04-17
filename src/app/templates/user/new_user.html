@@ -1,12 +1,14 @@
-{{ define "user/new.html" }}
+{{ define "new_user.html" }}
 {{ template "top" }}
 <h1>New User</h1>
 
 <hr>
 
 <form name="user" action="/users" method="POST">
-    <label>ユーザーID</label>
+    <label>ニックネーム</label>
     <input name="name" type="text">
+    <label>ログインID</label>
+    <input name="login_id" type="text">
     <label>password</label>
     <input name="password" type="text">
     <input type="submit">

@@ -66,25 +66,27 @@ func Open(port string) {
 
 	users := router.Group("/users")
 	{
-		// users.GET("", controllers.ShowUsers)
-		users.GET("/:id", middlewares.RequireLogin(), controllers.ShowUser)
-		users.GET("/new", controllers.NewUser)
-		users.POST("", controllers.CreateUser)
-		// users.GET("/edit", controllers.EditURL)
-		// users.PUT("/:id", middlewares.RequireLogin(), controllers.UpdateUser)
-		// users.DELETE("/:id", middlewares.RequireLogin(), controllers.DeleteUser)
-
+		ctrl := controllers.UsersController{}
+		users.GET("", ctrl.ShowAll)
+		users.GET("/:id", ctrl.Show)
+		users.GET("/new", ctrl.New)
+		users.POST("", ctrl.Create)
+		users.GET("/edit", middlewares.RequireLogin(), ctrl.Edit)
+		users.PUT("/:id", middlewares.RequireLogin(), ctrl.Update)
+		users.PATCH("/:id", middlewares.RequireLogin(), ctrl.Update)
+		users.DELETE("/:id", middlewares.RequireLogin(), ctrl.Delete)
 	}
 
 	urls := router.Group("/users/:id/urls")
 	{
-		// urls.GET("", controllers.ShowURLs)
-		// urls.GET("/:id", controllers.ShowURL)
-		urls.GET("/new", controllers.NewURL)
-		urls.POST("", controllers.CreateURL)
-		// urls.GET("/:url_id/edit", controllers.EditURL)
-		// urls.PUT("/:url_id", controllers.UpdateURL)
-		urls.GET("/:urlID/delete", controllers.DeleteURL)
+		urls.GET("", controllers.ShowURLs)
+		urls.GET("/:url_id", controllers.ShowURL)
+		urls.GET("/new", middlewares.RequireLogin(), controllers.NewURL)
+		urls.POST("", middlewares.RequireLogin(), controllers.CreateURL)
+		urls.GET("/:url_id/edit", middlewares.RequireLogin(), controllers.EditURL)
+		urls.PUT("/:url_id", middlewares.RequireLogin(), controllers.UpdateURL)
+		urls.PATCH("/:url_id", middlewares.RequireLogin(), controllers.UpdateURL)
+		urls.DELETE("/:url_id/delete", middlewares.RequireLogin(), controllers.DeleteURL)
 	}
 
 	router.Run(":8080")

@@ -13,10 +13,10 @@ type URLRepository interface {
 	Destory(models.URL) error
 }
 
-type DefaultURLRepositoryImpl struct {
+type PostgreSQLURLRepository struct {
 }
 
-func (self DefaultURLRepositoryImpl) GetAll() ([]models.URL, error) {
+func (repo PostgreSQLURLRepository) GetAll() ([]models.URL, error) {
 	db := db.GetDB()
 	if db.Error != nil {
 		return []models.URL{}, db.Error
@@ -30,7 +30,7 @@ func (self DefaultURLRepositoryImpl) GetAll() ([]models.URL, error) {
 	return urls, nil
 }
 
-func (self DefaultURLRepositoryImpl) GetByUserID(id int) ([]models.URL, error) {
+func (repo PostgreSQLURLRepository) GetByUserID(id int) ([]models.URL, error) {
 	db := db.GetDB()
 	if db.Error != nil {
 		return []models.URL{}, db.Error
@@ -44,7 +44,7 @@ func (self DefaultURLRepositoryImpl) GetByUserID(id int) ([]models.URL, error) {
 	return urls, nil
 }
 
-func (self DefaultURLRepositoryImpl) GetByID(id int) (models.URL, error) {
+func (repo PostgreSQLURLRepository) GetByID(id int) (models.URL, error) {
 	db := db.GetDB()
 	if db.Error != nil {
 		return models.URL{}, db.Error
@@ -59,7 +59,7 @@ func (self DefaultURLRepositoryImpl) GetByID(id int) (models.URL, error) {
 	return url, nil
 }
 
-func (self DefaultURLRepositoryImpl) Create(url models.URL) error {
+func (repo PostgreSQLURLRepository) Create(url models.URL) error {
 	db := db.GetDB()
 	if db.Error != nil {
 		return db.Error
@@ -73,7 +73,7 @@ func (self DefaultURLRepositoryImpl) Create(url models.URL) error {
 	return nil
 }
 
-func (self DefaultURLRepositoryImpl) Update(url models.URL) error {
+func (repo PostgreSQLURLRepository) Update(url models.URL) error {
 	db := db.GetDB()
 	if db.Error != nil {
 		return db.Error
@@ -87,7 +87,7 @@ func (self DefaultURLRepositoryImpl) Update(url models.URL) error {
 	return nil
 }
 
-func (self DefaultURLRepositoryImpl) Destroy(url models.URL) error {
+func (repo PostgreSQLURLRepository) Delete(url models.URL) error {
 	db := db.GetDB()
 	if db.Error != nil {
 		return db.Error

@@ -1,20 +1,23 @@
 package middlewares
 
 import (
+	"log"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
 func RequireLogin() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		log.Println()
 		session := sessions.Default(c)
-		uid := session.Get("uid")
+		uid := session.Get("login_id")
 		if uid == nil {
-			c.Set("loggsin", false)
-			c.Redirect(302, "/about")
+			c.Set("loggedin", false)
+			c.Redirect(302, "/home")
 			c.Abort()
 		} else {
-			c.Set("logsin", true)
+			c.Set("loggedin", true)
 			c.Next()
 		}
 	}

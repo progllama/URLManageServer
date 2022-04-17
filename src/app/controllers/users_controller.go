@@ -2,151 +2,152 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"url_manager/app/models"
-	"url_manager/app/models/repositories"
+	"url_manager/app/repositories"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-func ShowUsers(c *gin.Context) {
-	var repo repositories.UserRepository
-	users, err := repo.GetAll()
+type UserCreatForm struct {
+	Name     string `form:"name"`
+	LoginId  string `form:"login_id"`
+	Password string `form:"password"`
+}
+
+type UserURI struct {
+	Id string `uri:"id"`
+}
+
+func (uri *UserURI) ToInt() int {
+	id, err := strconv.Atoi(uri.Id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		c.Abort()
-	} else {
-		c.JSON(http.StatusOK, users)
+		log.Fatal(err)
+	}
+	return id
+}
+
+type UserEditForm struct {
+	Name     string `form:"name"`
+	LoginId  string `form:"login_id"`
+	Password string `form:"password"`
+}
+
+type UsersController struct {
+	repo *repositories.UserRepository
+}
+
+func NewUserController() *UsersController {
+	return &UsersController{
+		repo: repositories.NewUserRepository(),
 	}
 }
 
-func ShowUser(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
-	if uint(id) != sessions.Default(c).Get("uid") {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong id or not logged in."})
+func (ctrl *UsersController) ShowAll(c *gin.Context) {
+	users, err := ctrl.repo.All()
+	if err != nil {
+		c.Error(err)
 		return
 	}
 
-	var u repositories.UserRepository
-	uid, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
-		return
-	}
-	user, err := u.GetByID(uid)
-
-	urlrepo := repositories.DefaultURLRepositoryImpl{}
-	urls, err := urlrepo.GetByUserID(uid)
-
-	safeUrls := make([]SafeURL, len(urls))
-
-	for i, v := range urls {
-		safeUrls[i] = SafeURL{
-			fmt.Sprintf("%d", v.ID),
-			v.Title,
-			v.URL,
-		}
-	}
-
-	fmt.Println(c.GetBool("logsin"))
-
-	if err != nil {
-		c.AbortWithStatus(400)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		c.HTML(http.StatusOK, "user/show.html", gin.H{
-			"title":  "ShowUser",
-			"name":   user.Name,
-			"id":     user.ID,
-			"urls":   safeUrls,
-			"logsin": c.GetBool("logsin"),
-		})
-	}
+	c.HTML(http.StatusOK, "show_users.html", gin.H{"loggedin": ctrl.logsin(c), "users": users})
 }
 
-type SafeURL struct {
-	ID    string
-	Title string
-	Url   string
-}
+func (ctrl *UsersController) Show(c *gin.Context) {
+	var uri UserURI
+	err := c.ShouldBindUri(&uri)
 
-func NewUser(c *gin.Context) {
-	c.HTML(http.StatusOK, "user/new.html", gin.H{"title": "NewUser"})
-}
+	log.Println("Success form binding.")
+	log.Println(uri.Id)
 
-func CreateUser(c *gin.Context) {
-	c.Request.ParseForm()
-	name := c.Request.FormValue("name")
-	password := c.Request.FormValue("password")
-
-	r := repositories.UserRepository{}
-	_, err := r.Exists(name)
+	user, err := ctrl.repo.FindByID(uri.ToInt())
 	if err != nil {
-		fmt.Println(err)
-		c.Redirect(302, "/users/new")
-		c.Abort()
+		c.Error(err)
 		return
 	}
 
-	err = r.Create(models.User{
-		Name:     name,
-		Password: password,
-	})
+	log.Println("Success find user.")
 
+	c.HTML(http.StatusOK, "show_user.html", gin.H{"loggedin": ctrl.logsin(c), "user": user})
+}
+
+func (ctrl *UsersController) New(c *gin.Context) {
+	c.HTML(http.StatusOK, "new_user.html", gin.H{"loggedin": ctrl.logsin(c), "title": "NewUser"})
+}
+
+func (ctrl *UsersController) Create(c *gin.Context) {
+	var form UserCreatForm
+	err := c.ShouldBind(&form)
 	if err != nil {
-		fmt.Println(err)
-		c.Redirect(302, "/users")
-		c.Abort()
+		c.Error(err)
 		return
 	}
 
-	u, err := r.GetByName(name)
+	log.Println("Success form binding.")
 
+	exist, err := ctrl.repo.Exists(models.User{Name: form.Name})
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	if exist {
+		log.Println("Name is not unique.")
+		return
+	}
+
+	log.Println("Name is unique.")
+
+	err = ctrl.repo.Create(form.Name, form.LoginId, form.Password)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	log.Println("Success create.")
+
+	c.Redirect(http.StatusFound, "/login")
+}
+
+func (ctrl *UsersController) Edit(c *gin.Context) {
+	c.HTML(http.StatusOK, "edit_user.html", gin.H{"loggedin": ctrl.logsin(c)})
+}
+
+func (ctrl *UsersController) Update(c *gin.Context) {
+	var uri UserURI
+	c.ShouldBindUri(&uri)
+
+	var form UserEditForm
+	err := c.ShouldBind(&form)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	ctrl.repo.Update(uri.ToInt(), form.Name, form.LoginId, form.Password)
+	if err != nil {
+		c.Error(err)
+	}
+
+	c.Redirect(http.StatusFound, "/users/"+strconv.Itoa(uri.ToInt()))
+}
+
+func (ctrl *UsersController) Delete(c *gin.Context) {
+	var uri UserURI
+	c.ShouldBind(uri)
+
+	if err := ctrl.repo.Delete(uri.ToInt()); err != nil {
+		return
+	}
+
+	c.Redirect(http.StatusFound, "/home")
+}
+
+func (ctrl *UsersController) logsin(c *gin.Context) bool {
 	sessoin := sessions.Default(c)
-	Login(sessoin, u.ID)
-
-	c.Redirect(302, "/login")
-	c.Abort()
-}
-
-func EditUser(c *gin.Context) {
-
-}
-
-func UpdateUser(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
-	if uint(id) != sessions.Default(c).Get("uid") {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong id or not logged in."})
-		return
-	}
-
-	uid, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"error": err.Error()})
-		return
-	}
-	user, err := repositories.UserRepository{}.UpdateByID(uid, c)
-
-	if err != nil {
-		c.AbortWithStatus(400)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		c.JSON(http.StatusOK, gin.H{"name": user.Name, "id": user.ID})
-	}
-}
-
-func DeleteUser(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Params.ByName("id"))
-
-	var u repositories.UserRepository
-	if err := u.DeleteByID(id); err != nil {
-		c.AbortWithStatus(403)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(200, gin.H{"success": "ID" + strconv.Itoa(id) + "Deleted"})
-	return
+	id := sessoin.Get("login_id")
+	fmt.Println(id)
+	return id != nil
 }

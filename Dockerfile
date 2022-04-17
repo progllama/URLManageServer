@@ -1,7 +1,7 @@
 # 2020/10/14最新versionを取得
 FROM golang:1.15.2-alpine
 # アップデートとgitのインストール！！
-RUN apk update && apk add git
+RUN apk update && apk add git && apk add gcc && apk add --no-cache musl-dev
 # appディレクトリの作成
 RUN mkdir /go/src/app
 # ワーキングディレクトリの設定

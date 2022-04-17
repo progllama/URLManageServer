@@ -1,12 +1,11 @@
-{{ define "session/login.html" }}
+{{ define "login.html" }}
 {{ template "top" }}
+
 <h1>Login</h1>
-
 <hr>
-
-<form name="acount" action="/login" method="POST">
-    <label>ユーザーID</label>
-    <input name="userId" type="text">
+<form name="user" action="/login" method="POST">
+    <label>ログインID</label>
+    <input name="login_id" type="text">
     <label>password</label>
     <input name="password" type="text">
     <input type="submit">
