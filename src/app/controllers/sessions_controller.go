@@ -26,6 +26,7 @@ type LoginForm struct {
 // }
 
 func CreateSession(c *gin.Context) {
+	fmt.Println(c.Request.RequestURI)
 	var form LoginForm
 	c.ShouldBind(&form)
 

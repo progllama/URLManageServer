@@ -10,6 +10,7 @@ type User struct {
 	Name     string `form:"name" json:"name" binding:"required" gorm:"unique;not null"`
 	LoginId  string `form:"login_id" json:"login_id" binding:""`
 	Password string `form:"password" json:"password" binding:"required" gorm:"size:100"`
+	Urls     []Url  `gorm:"foreignKey:OwnerId"`
 }
 
 // TODO パスワードのハッシュ化はこの構造体の責務"オブジェクトの永続化"でないので移動する。

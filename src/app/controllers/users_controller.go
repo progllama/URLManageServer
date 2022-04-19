@@ -57,6 +57,7 @@ func (ctrl *UsersController) ShowAll(c *gin.Context) {
 }
 
 func (ctrl *UsersController) Show(c *gin.Context) {
+	fmt.Println(c.Request.RequestURI)
 	var uri UserURI
 	err := c.ShouldBindUri(&uri)
 
@@ -71,7 +72,7 @@ func (ctrl *UsersController) Show(c *gin.Context) {
 
 	log.Println("Success find user.")
 
-	c.HTML(http.StatusOK, "show_user.html", gin.H{"loggedin": ctrl.logsin(c), "user": user})
+	c.HTML(http.StatusOK, "show_user.html", gin.H{"loggedin": ctrl.logsin(c), "id": user.ID, "user": user})
 }
 
 func (ctrl *UsersController) New(c *gin.Context) {
@@ -79,6 +80,7 @@ func (ctrl *UsersController) New(c *gin.Context) {
 }
 
 func (ctrl *UsersController) Create(c *gin.Context) {
+	fmt.Println(c.Request.RequestURI)
 	var form UserCreatForm
 	err := c.ShouldBind(&form)
 	if err != nil {

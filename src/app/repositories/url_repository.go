@@ -1,79 +1,95 @@
 package repositories
 
 import (
+	"fmt"
+	"log"
 	"url_manager/app/models"
 	"url_manager/db"
 )
 
-type URLRepository interface {
-	GetByUserID(int) ([]models.URL, error)
-	GetByID(int) (models.URL, error)
-	Create(models.URL) error
-	Update(models.URL) error
-	Destory(models.URL) error
+// type URLRepository interface {
+// 	GetByUserID(int) ([]models.URL, error)
+// 	GetByID(int) (models.URL, error)
+// 	Create(models.URL) error
+// 	Update(models.URL) error
+// 	Destory(models.URL) error
+// }
+
+func NewUrlRepository() *PostgreSQLURLRepository {
+	return &PostgreSQLURLRepository{}
 }
 
 type PostgreSQLURLRepository struct {
 }
 
-func (repo PostgreSQLURLRepository) GetAll() ([]models.URL, error) {
+func (repo PostgreSQLURLRepository) All() ([]models.Url, error) {
 	db := db.GetDB()
 	if db.Error != nil {
-		return []models.URL{}, db.Error
+		return []models.Url{}, db.Error
 	}
 
-	var urls []models.URL
+	var urls []models.Url
 	if err := db.Select("*").Find(&urls).Error; err != nil {
-		return []models.URL{}, err
+		return []models.Url{}, err
 	}
 
 	return urls, nil
 }
 
-func (repo PostgreSQLURLRepository) GetByUserID(id int) ([]models.URL, error) {
+func (repo PostgreSQLURLRepository) FindByUserID(id int) ([]models.Url, error) {
 	db := db.GetDB()
 	if db.Error != nil {
-		return []models.URL{}, db.Error
+		return []models.Url{}, db.Error
 	}
 
-	var urls []models.URL
-	if err := db.Select("id, url, title").Where("user_id=?", id).Find(&urls).Error; err != nil {
-		return []models.URL{}, err
+	var user models.User
+	user.ID = uint(id)
+	var urls []models.Url
+	fmt.Println(id)
+	fmt.Println(db.Model(&user).Error)
+	fmt.Println(db.Model(&user).Where("id=?", id).Error)
+	fmt.Println(db.Model(&user).Where("id=?", id).Association("Urls").Find(&urls).Error)
+	if err := db.Model(&user).Association("Urls").Find(&urls).Error; err != nil {
+		fmt.Println(err)
+		return []models.Url{}, err
 	}
 
 	return urls, nil
 }
 
-func (repo PostgreSQLURLRepository) GetByID(id int) (models.URL, error) {
+func (repo PostgreSQLURLRepository) FindByID(id int) (models.Url, error) {
 	db := db.GetDB()
 	if db.Error != nil {
-		return models.URL{}, db.Error
+		return models.Url{}, db.Error
 	}
 
-	var url models.URL
+	var url models.Url
 	err := db.Select("title, url").Where("id=?", id).Find(&url).Error
 	if err != nil {
-		return models.URL{}, err
+		return models.Url{}, err
 	}
 
 	return url, nil
 }
 
-func (repo PostgreSQLURLRepository) Create(url models.URL) error {
+func (repo PostgreSQLURLRepository) Create(ownerId int, url *models.Url) error {
 	db := db.GetDB()
 	if db.Error != nil {
 		return db.Error
 	}
 
-	g := db.Create(&url)
+	user := models.User{}
+	user.ID = uint(ownerId)
+	g := db.Model(&user).Association("Urls").Append(&[]models.Url{*url})
 	if g.Error != nil {
+		log.Println("ERR ", g.Error)
 		return g.Error
 	}
 
 	return nil
 }
 
-func (repo PostgreSQLURLRepository) Update(url models.URL) error {
+func (repo PostgreSQLURLRepository) Update(url models.Url) error {
 	db := db.GetDB()
 	if db.Error != nil {
 		return db.Error
@@ -87,7 +103,7 @@ func (repo PostgreSQLURLRepository) Update(url models.URL) error {
 	return nil
 }
 
-func (repo PostgreSQLURLRepository) Delete(url models.URL) error {
+func (repo PostgreSQLURLRepository) Delete(url models.Url) error {
 	db := db.GetDB()
 	if db.Error != nil {
 		return db.Error

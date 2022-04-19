@@ -1,0 +1,15 @@
+{{ define "show_urls.html" }}
+{{ template "top" .}}
+<h1>Show urls.</h1>
+<a href="/users/{{ .user_id }}/urls/new">追加</a>
+<hr>
+
+{{ range $i, $v := .urls}}
+<div class="url">
+    <div class="url-link"><a href="{{$v.Url}}" target="_blank">{{$v.Title}}</a></div>
+    <div class="url-description"><p>{{$v.Description}}</p></div>
+</div>
+{{ end }}
+
+{{ template "bottom" }}
+{{ end }}

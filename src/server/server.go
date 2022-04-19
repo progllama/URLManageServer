@@ -17,12 +17,15 @@ func Open(port string) {
 	router.LoadHTMLGlob("app/templates/**/*")
 	router.Static("/css", "app/assets/css")
 	router.Static("/js", "app/assets/js")
+	router.Static("favcion.ico", "app/assets/favicon.ico")
 
 	store, err := redis.NewStore(10, "tcp", "redis:6379", "", []byte("32bytes-secret-auth-key"))
 	if err != nil {
 		panic(err)
 	}
 	router.Use(sessions.Sessions("URLManager", store))
+
+	router.Use(middlewares.ServeFavicon("./favicon.ico"))
 
 	router.Use(cors.New(cors.Config{
 		// 許可したいHTTPメソッドの一覧
@@ -64,6 +67,18 @@ func Open(port string) {
 	router.POST("/login", controllers.CreateSession)
 	router.GET("/logout", controllers.DestroySession)
 
+	urls := router.Group("/users/:id/urls")
+	{
+		urls.GET("", controllers.ShowURLs)
+		urls.GET("/:url_id", controllers.ShowURL)
+		urls.GET("/new", controllers.NewURL)
+		urls.POST("", controllers.CreateURL)
+		urls.GET("/:url_id/edit", controllers.EditURL)
+		urls.PUT("/:url_id", controllers.UpdateURL)
+		urls.PATCH("/:url_id", controllers.UpdateURL)
+		urls.DELETE("/:url_id", controllers.DeleteURL)
+	}
+
 	users := router.Group("/users")
 	{
 		ctrl := controllers.UsersController{}
@@ -71,22 +86,10 @@ func Open(port string) {
 		users.GET("/:id", ctrl.Show)
 		users.GET("/new", ctrl.New)
 		users.POST("", ctrl.Create)
-		users.GET("/edit", middlewares.RequireLogin(), ctrl.Edit)
+		users.GET("/:id/edit", middlewares.RequireLogin(), ctrl.Edit)
 		users.PUT("/:id", middlewares.RequireLogin(), ctrl.Update)
 		users.PATCH("/:id", middlewares.RequireLogin(), ctrl.Update)
 		users.DELETE("/:id", middlewares.RequireLogin(), ctrl.Delete)
-	}
-
-	urls := router.Group("/users/:id/urls")
-	{
-		urls.GET("", controllers.ShowURLs)
-		urls.GET("/:url_id", controllers.ShowURL)
-		urls.GET("/new", middlewares.RequireLogin(), controllers.NewURL)
-		urls.POST("", middlewares.RequireLogin(), controllers.CreateURL)
-		urls.GET("/:url_id/edit", middlewares.RequireLogin(), controllers.EditURL)
-		urls.PUT("/:url_id", middlewares.RequireLogin(), controllers.UpdateURL)
-		urls.PATCH("/:url_id", middlewares.RequireLogin(), controllers.UpdateURL)
-		urls.DELETE("/:url_id/delete", middlewares.RequireLogin(), controllers.DeleteURL)
 	}
 
 	router.Run(":8080")

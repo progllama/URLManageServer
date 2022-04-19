@@ -32,5 +32,5 @@ func Close() {
 
 func Migrate() {
 	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.URL{})
+	db.AutoMigrate(&models.Url{})
 }

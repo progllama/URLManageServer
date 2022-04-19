@@ -2,12 +2,12 @@
 <div class="header-container">
 <header>
 {{ if .loggedin }}
-    <a href="/users/{{ .id }}">url-plumber</a>
-    <a href="/logout">Logout</a>
+    <a id="top" href="/users/{{ .id }}">url-plumber</a>
+    <a id="logout" href="/logout">Logout</a>
 {{ else }}
-    <a href="/about">url-plumber</a>
-    <a href="/login">Login</a>
-    <a href="/users/new">Create Acount</a>
+    <a id="top" href="/about">url-plumber</a>
+    <a id="login" href="/login">Login</a>
+    <a id="sign-up" href="/users/new">Create Acount</a>
 {{ end }}
 </header>
 </div>

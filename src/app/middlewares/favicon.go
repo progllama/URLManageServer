@@ -2,7 +2,9 @@ package middlewares
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -25,6 +27,7 @@ func ServeFavicon(path string) gin.HandlerFunc {
 		// 作業ディレクトリと引数のパスを結合
 		path = filepath.Join(wd, path)
 	}
+	fmt.Println(path)
 
 	// ファイルの情報を取得
 	info, err := os.Stat(path)
@@ -41,15 +44,19 @@ func ServeFavicon(path string) gin.HandlerFunc {
 	}
 
 	reader := bytes.NewReader(file)
+	log.Println("Success to regist ServeFavicon middleware.")
 
 	// ハンドラを返す
 	return func(c *gin.Context) {
 		// リクエストのURIがちがければ終了
 		if c.Request.RequestURI != "/favicon.ico" {
+			fmt.Println(c.Request.RequestURI)
+			log.Println("wrong uri.")
 			return
 		}
 		// GET、HEAD以外なら
 		if c.Request.Method != "GET" && c.Request.Method != "HEAD" {
+			fmt.Println("wrong method.")
 			status := http.StatusOK
 			// OPTIONじゃないならStatusOK -> MethodNotAllowdに変更
 			if c.Request.Method != "OPTIONS" {
