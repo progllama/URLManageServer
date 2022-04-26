@@ -2,14 +2,15 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
+	"url_manager/app"
 	"url_manager/app/forms"
 	"url_manager/app/models"
 
 	"url_manager/app/repositories"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,7 +33,8 @@ func (uri *UrlsUri) UserIdAsInt() int {
 }
 
 func (uri *UrlsUri) UrlIdAsInt() int {
-	value, err := strconv.Atoi(uri.UserId)
+	fmt.Println(uri.UrlId)
+	value, err := strconv.Atoi(uri.UrlId)
 	if err != nil {
 		panic(err)
 	}
@@ -44,24 +46,49 @@ func ShowURLs(c *gin.Context) {
 	c.ShouldBindUri(&uri)
 
 	repo := repositories.NewUrlRepository()
-	urls, err := repo.FindByUserID(uri.UrlIdAsInt())
-	fmt.Println(urls[2].Note)
+	urls, err := repo.FindByUserID(uri.UserIdAsInt())
 	if err != nil {
 		return
 	}
 
-	c.HTML(http.StatusOK, "show_urls.html", gin.H{"title": "Show urls.", "user_id": uri.UserIdAsInt(), "urls": urls})
+	session := app.NewRedisSession(c)
+
+	c.HTML(
+		http.StatusOK,
+		"show_urls.html",
+		gin.H{
+			"login":   session.HasUserId(),
+			"title":   "Show urls.",
+			"user_id": uri.UserIdAsInt(),
+			"urls":    urls,
+		},
+	)
 }
 
 func ShowURL(c *gin.Context) {
-	c.HTML(http.StatusOK, "show_url.html", gin.H{})
+	session := app.NewRedisSession(c)
+	c.HTML(
+		http.StatusOK,
+		"show_url.html",
+		gin.H{
+			"login": session.HasUserId(),
+		},
+	)
 }
 
 func NewURL(c *gin.Context) {
 	var uri UrlsUri
 	c.ShouldBindUri(&uri)
+	session := app.NewRedisSession(c)
 
-	c.HTML(http.StatusOK, "urls/new.html", gin.H{"id": uri.UserIdAsInt()})
+	c.HTML(
+		http.StatusOK,
+		"urls/new.html",
+		gin.H{
+			"login": session.HasUserId(),
+			"id":    uri.UserIdAsInt(),
+		},
+	)
 }
 
 func CreateURL(c *gin.Context) {
@@ -72,17 +99,20 @@ func CreateURL(c *gin.Context) {
 	var form forms.UrlCreateForm
 	c.ShouldBind(&form)
 
-	session := sessions.Default(c)
-	loginId := session.Get("login_id")
-	if loginId == nil {
-		c.Abort()
+	session := app.NewRedisSession(c)
+	session.HasUserId()
+
+	if !session.HasUserId() {
+		log.Println("User id is not in the session.")
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
 	urepo := repositories.NewUserRepository()
-	user, err := urepo.FindByLoginId(loginId.(string))
+	user, err := urepo.FindById(session.GetUserId())
 	if err != nil {
-		c.Abort()
+		log.Fatal("Can't find user. User id : ", session.GetUserId())
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
@@ -108,7 +138,14 @@ func CreateURL(c *gin.Context) {
 }
 
 func EditURL(c *gin.Context) {
-	c.HTML(http.StatusOK, "edit_url.html", gin.H{})
+	session := app.NewRedisSession(c)
+	c.HTML(
+		http.StatusOK,
+		"edit_url.html",
+		gin.H{
+			"login": session.HasUserId(),
+		},
+	)
 }
 
 func UpdateURL(c *gin.Context) {
@@ -116,16 +153,19 @@ func UpdateURL(c *gin.Context) {
 }
 
 func DeleteURL(c *gin.Context) {
-	url := models.Url{}
-	id, _ := strconv.Atoi(c.Param("urlID"))
-	url.ID = uint(id)
+	log.Println(c.Request.RequestURI)
+	var uri UrlsUri
+	c.ShouldBindUri(&uri)
 
-	repo := repositories.PostgreSQLURLRepository{}
-	repo.Delete(url)
+	url := models.Url{}
+	url.ID = uint(uri.UrlIdAsInt())
 	fmt.Println(url.ID)
 
-	session := sessions.Default(c)
-	userID := fmt.Sprintf("%d", session.Get("uid"))
+	repo := repositories.NewUrlRepository()
+	err := repo.Delete(url)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	c.Redirect(302, "/users/"+userID)
+	c.JSON(http.StatusOK, gin.H{"status": "success"})
 }

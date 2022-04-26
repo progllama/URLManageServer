@@ -59,29 +59,16 @@ func Open(port string) {
 		MaxAge: 24 * time.Hour,
 	}))
 
-	router.GET("/", controllers.About)
-	router.GET("/about", controllers.About)
-	router.GET("/contact", controllers.Contact)
-
-	router.GET("/login", controllers.NewSession)
-	router.POST("/login", controllers.CreateSession)
-	router.GET("/logout", controllers.DestroySession)
-
-	urls := router.Group("/users/:id/urls")
 	{
-		urls.GET("", controllers.ShowURLs)
-		urls.GET("/:url_id", controllers.ShowURL)
-		urls.GET("/new", controllers.NewURL)
-		urls.POST("", controllers.CreateURL)
-		urls.GET("/:url_id/edit", controllers.EditURL)
-		urls.PUT("/:url_id", controllers.UpdateURL)
-		urls.PATCH("/:url_id", controllers.UpdateURL)
-		urls.DELETE("/:url_id", controllers.DeleteURL)
+		ctrl := controllers.NewSessionController()
+		router.GET("/login", ctrl.NewSession)
+		router.POST("/login", ctrl.CreateSession)
+		router.DELETE("/logout", ctrl.DestroySession)
 	}
 
 	users := router.Group("/users")
 	{
-		ctrl := controllers.UsersController{}
+		ctrl := controllers.NewUserController()
 		users.GET("", ctrl.ShowAll)
 		users.GET("/:id", ctrl.Show)
 		users.GET("/new", ctrl.New)
@@ -90,6 +77,19 @@ func Open(port string) {
 		users.PUT("/:id", middlewares.RequireLogin(), ctrl.Update)
 		users.PATCH("/:id", middlewares.RequireLogin(), ctrl.Update)
 		users.DELETE("/:id", middlewares.RequireLogin(), ctrl.Delete)
+
+		router.GET("/", middlewares.RequireLogin(), ctrl.Show)
+
+		urls := users.Group("/:id/urls")
+		{
+			urls.GET("", controllers.ShowURLs)
+			urls.GET("/:url_id", controllers.ShowURL)
+			urls.GET("/new", middlewares.RequireLogin(), controllers.NewURL)
+			urls.POST("", middlewares.RequireLogin(), controllers.CreateURL)
+			urls.GET("/:url_id/edit", middlewares.RequireLogin(), controllers.EditURL)
+			urls.PUT("/:url_id", middlewares.RequireLogin(), controllers.UpdateURL)
+			urls.DELETE("/:url_id", middlewares.RequireLogin(), controllers.DeleteURL)
+		}
 	}
 
 	router.Run(":8080")

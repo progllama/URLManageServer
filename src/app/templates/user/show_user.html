@@ -1,7 +1,9 @@
 {{ define "show_user.html" }}
 {{ template "top" . }}
 <h1>{{ .user.Name }}'s Page.</h1>
+{{ if .login }}
 <a href="/users/{{ .id }}/urls/new">追加</a>
+{{ end }}
 <hr>
 {{ range $i, $v := .urls}}
     <div class="url">

@@ -1,11 +1,11 @@
 {{ define "header" }}
 <div class="header-container">
 <header>
-{{ if .loggedin }}
+{{ if .login }}
     <a id="top" href="/users/{{ .id }}">url-plumber</a>
-    <a id="logout" href="/logout">Logout</a>
+    <button id="logout">Logout</a>
 {{ else }}
-    <a id="top" href="/about">url-plumber</a>
+    <a id="top" href="/">url-plumber</a>
     <a id="login" href="/login">Login</a>
     <a id="sign-up" href="/users/new">Create Acount</a>
 {{ end }}

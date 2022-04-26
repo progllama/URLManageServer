@@ -1,40 +1,23 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"url_manager/app"
+	"url_manager/app/forms"
 	"url_manager/app/models"
 	"url_manager/app/repositories"
+	"url_manager/app/uris"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-type UserCreatForm struct {
-	Name     string `form:"name"`
-	LoginId  string `form:"login_id"`
-	Password string `form:"password"`
-}
-
-type UserURI struct {
-	Id string `uri:"id"`
-}
-
-func (uri *UserURI) ToInt() int {
-	id, err := strconv.Atoi(uri.Id)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return id
-}
-
-type UserEditForm struct {
-	Name     string `form:"name"`
-	LoginId  string `form:"login_id"`
-	Password string `form:"password"`
-}
+var (
+	ErrCantExtractUserId = errors.New("can't extract user id.")
+)
 
 type UsersController struct {
 	repo *repositories.UserRepository
@@ -47,41 +30,85 @@ func NewUserController() *UsersController {
 }
 
 func (ctrl *UsersController) ShowAll(c *gin.Context) {
-	users, err := ctrl.repo.All()
+	users, err := ctrl.repo.AllIdAndNames()
 	if err != nil {
 		c.Error(err)
 		return
 	}
 
-	c.HTML(http.StatusOK, "show_users.html", gin.H{"loggedin": ctrl.logsin(c), "users": users})
+	session := app.NewRedisSession(c)
+	login := session.HasUserId()
+
+	c.HTML(
+		http.StatusOK,
+		"show_users.html",
+		gin.H{
+			"login": login,
+			"users": users,
+		},
+	)
 }
 
-func (ctrl *UsersController) Show(c *gin.Context) {
-	fmt.Println(c.Request.RequestURI)
-	var uri UserURI
-	err := c.ShouldBindUri(&uri)
-
-	log.Println("Success form binding.")
-	log.Println(uri.Id)
-
-	user, err := ctrl.repo.FindByID(uri.ToInt())
+func (ctrl *UsersController) Show(ctx *gin.Context) {
+	userId, err := ctrl.extractUserId(ctx)
 	if err != nil {
-		c.Error(err)
+		log.Println(err)
+		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	log.Println("Success find user.")
+	user, err := ctrl.repo.FindById(userId)
+	if err != nil {
+		log.Fatal(err)
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
 
-	c.HTML(http.StatusOK, "show_user.html", gin.H{"loggedin": ctrl.logsin(c), "id": user.ID, "user": user})
+	session := app.NewRedisSession(ctx)
+	login := session.HasUserId()
+
+	ctx.HTML(
+		http.StatusOK,
+		"show_user.html",
+		gin.H{
+			"login": login,
+			"id":    user.ID,
+			"user":  user,
+		},
+	)
+}
+
+func (ctrl *UsersController) extractUserId(ctx *gin.Context) (int, error) {
+	session := app.NewRedisSession(ctx)
+	if session.HasUserId() {
+		return session.GetUserId(), nil
+	}
+
+	var uri uris.UserUri
+	err := ctx.ShouldBindUri(&uri)
+	if err == nil {
+		return uri.GetUserId(), nil
+	}
+
+	return 0, ErrCantExtractUserId
 }
 
 func (ctrl *UsersController) New(c *gin.Context) {
-	c.HTML(http.StatusOK, "new_user.html", gin.H{"loggedin": ctrl.logsin(c), "title": "NewUser"})
+	session := app.NewRedisSession(c)
+
+	c.HTML(
+		http.StatusOK,
+		"new_user.html",
+		gin.H{
+			"login": session.HasUserId(),
+			"title": "NewUser",
+		},
+	)
 }
 
 func (ctrl *UsersController) Create(c *gin.Context) {
 	fmt.Println(c.Request.RequestURI)
-	var form UserCreatForm
+	var form forms.UserCreateForm
 	err := c.ShouldBind(&form)
 	if err != nil {
 		c.Error(err)
@@ -114,14 +141,15 @@ func (ctrl *UsersController) Create(c *gin.Context) {
 }
 
 func (ctrl *UsersController) Edit(c *gin.Context) {
-	c.HTML(http.StatusOK, "edit_user.html", gin.H{"loggedin": ctrl.logsin(c)})
+	session := app.NewRedisSession(c)
+	c.HTML(http.StatusOK, "edit_user.html", gin.H{"login": session.HasUserId()})
 }
 
 func (ctrl *UsersController) Update(c *gin.Context) {
-	var uri UserURI
+	var uri uris.UserUri
 	c.ShouldBindUri(&uri)
 
-	var form UserEditForm
+	var form forms.UserEditForm
 	err := c.ShouldBind(&form)
 	if err != nil {
 		c.Error(err)
@@ -137,7 +165,7 @@ func (ctrl *UsersController) Update(c *gin.Context) {
 }
 
 func (ctrl *UsersController) Delete(c *gin.Context) {
-	var uri UserURI
+	var uri uris.UserUri
 	c.ShouldBind(uri)
 
 	if err := ctrl.repo.Delete(uri.ToInt()); err != nil {
@@ -145,11 +173,4 @@ func (ctrl *UsersController) Delete(c *gin.Context) {
 	}
 
 	c.Redirect(http.StatusFound, "/home")
-}
-
-func (ctrl *UsersController) logsin(c *gin.Context) bool {
-	sessoin := sessions.Default(c)
-	id := sessoin.Get("login_id")
-	fmt.Println(id)
-	return id != nil
 }

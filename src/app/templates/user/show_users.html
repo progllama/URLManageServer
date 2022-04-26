@@ -4,7 +4,7 @@
 <h1>Users</h1>
 <hr>
 {{ range $i, $v := .users}}
-    {{ $v }}
+    <a href="/users/{{$v.ID}}/urls">{{ $v.Name}}
 {{ end }}
 
 {{ template "bottom" }}

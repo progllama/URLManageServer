@@ -1,13 +1,16 @@
 {{ define "show_urls.html" }}
-{{ template "top" .}}
+{{ template "top" . }}
 <h1>Show urls.</h1>
+{{ if .login }}
 <a href="/users/{{ .user_id }}/urls/new">追加</a>
+{{ end }}
 <hr>
 
 {{ range $i, $v := .urls}}
-<div class="url">
+<div class="url" id="url_{{$i}}">
     <div class="url-link"><a href="{{$v.Url}}" target="_blank">{{$v.Title}}</a></div>
     <div class="url-description"><p>{{$v.Description}}</p></div>
+    <button class="delete_url" id="delete_{{$v.ID}}">Delete</button>
 </div>
 {{ end }}
 

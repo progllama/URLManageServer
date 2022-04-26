@@ -38,7 +38,7 @@ func (repo *UserRepository) Find(condition models.User) ([]models.User, error) {
 	}
 }
 
-func (repo *UserRepository) FindByID(id int) (models.User, error) {
+func (repo *UserRepository) FindById(id int) (models.User, error) {
 	fmt.Println(id)
 	var user models.User
 	dbResult := db.GetDB().Where("id=?", id).First(&user)
@@ -76,6 +76,22 @@ func (repo *UserRepository) FindByLoginId(loginId string) (models.User, error) {
 	}
 }
 
+type SafeUser struct {
+	Name string
+	ID   string
+}
+
+func (repo *UserRepository) AllIdAndNames() ([]SafeUser, error) {
+	var users []SafeUser
+	dbResult := repo.getDB().Table("users").Find(&users)
+
+	if dbResult.Error != nil {
+		return make([]SafeUser, 0), dbResult.Error
+	}
+
+	return users, nil
+}
+
 func (repo *UserRepository) Create(name string, loginId string, password string) error {
 	user := models.User{
 		Name:    name,
@@ -94,9 +110,7 @@ func (repo *UserRepository) Create(name string, loginId string, password string)
 
 func (repo *UserRepository) Update(id int, name string, loginId string, password string) error {
 	u := models.User{
-		Model: gorm.Model{
-			ID: uint(id),
-		},
+		ID:       id,
 		Name:     name,
 		LoginId:  loginId,
 		Password: password,

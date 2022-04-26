@@ -2,97 +2,63 @@ package controllers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
+	"url_manager/app"
+	"url_manager/app/forms"
 	"url_manager/app/repositories"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
-func NewSession(c *gin.Context) {
+type SessionController struct{}
+
+func NewSessionController() SessionController {
+	return SessionController{}
+}
+
+func (ctrl *SessionController) NewSession(c *gin.Context) {
 	c.HTML(http.StatusOK, "login.html", gin.H{"title": "login"})
 }
 
-type LoginForm struct {
-	LoginId  string `form:"login_id"`
-	Password string `form:"password"`
-}
-
-// type SessionURI struct {
-// 	Id int `uri:"id"`
-// }
-
-func CreateSession(c *gin.Context) {
-	fmt.Println(c.Request.RequestURI)
-	var form LoginForm
-	c.ShouldBind(&form)
-
-	// var uri SessionURI
-	// c.ShouldBind(uri)
-
-	log.Println("Success form binding.")
-	log.Println(form.LoginId)
-	log.Println(form.Password)
-	log.Println("End")
-
-	session := sessions.Default(c)
-
-	if Authenticate(form.LoginId, form.Password) != nil {
-		log.Println("Fail to authenticate")
-		c.Redirect(http.StatusFound, "/users/new")
+func (ctrl *SessionController) CreateSession(c *gin.Context) {
+	var form forms.LoginForm
+	err := c.ShouldBind(&form)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	log.Println("Success to authenticate")
-
-	repo := repositories.UserRepository{}
-	u, err := repo.FindByLoginId(form.LoginId)
+	repo := repositories.NewUserRepository()
+	user, err := repo.FindByLoginId(form.LoginId)
 	if err != nil {
-		log.Println("Fail to findByLoginId")
-		c.Redirect(http.StatusFound, "/users/new")
+		ctrl.redirectToSignUp(c)
 		return
 	}
 
-	log.Println("Success to findByLoginId")
-	Login(session, u.LoginId)
-
-	c.Redirect(302, "/users/"+strconv.Itoa(int(u.ID)))
-}
-
-func Authenticate(loginId string, password string) error {
-
-	fmt.Println(loginId)
-	repo := repositories.UserRepository{}
-	u, err := repo.FindByLoginId(loginId)
-
-	log.Println(u, err)
-
-	if err != nil {
-		return err
+	if !user.Authenticate(form.LoginId, form.Password) {
+		ctrl.redirectToSignUp(c)
+		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); err != nil {
-		return err
-	}
+	session := ctrl.getNewSession(c)
+	session.SetUserId(int(user.ID))
+	fmt.Println("success", user.ID)
 
-	return nil
+	c.Redirect(http.StatusFound, "/users/"+strconv.Itoa(int(user.ID)))
 }
 
-func Login(s sessions.Session, loginId string) {
-	s.Set("login_id", loginId)
-	s.Save()
+func (ctrl *SessionController) DestroySession(c *gin.Context) {
+	session := ctrl.getNewSession(c)
+	session.Clear()
+
+	c.JSON(http.StatusOK, gin.H{"result": "success"})
 }
 
-func DestroySession(c *gin.Context) {
-	session := sessions.Default(c)
-	Logout(session)
-	c.Redirect(302, "/about")
+func (ctrl *SessionController) getNewSession(c *gin.Context) app.Session {
+	return app.NewRedisSession(c)
 }
 
-func Logout(s sessions.Session) {
-	s.Clear()
-	s.Save()
+func (ctrl *SessionController) redirectToSignUp(c *gin.Context) {
+	c.Redirect(http.StatusFound, "/users/new")
 }

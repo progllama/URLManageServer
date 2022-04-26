@@ -43,7 +43,7 @@ func (repo PostgreSQLURLRepository) FindByUserID(id int) ([]models.Url, error) {
 	}
 
 	var user models.User
-	user.ID = uint(id)
+	user.ID = id
 	var urls []models.Url
 	fmt.Println(id)
 	fmt.Println(db.Model(&user).Error)
@@ -79,7 +79,7 @@ func (repo PostgreSQLURLRepository) Create(ownerId int, url *models.Url) error {
 	}
 
 	user := models.User{}
-	user.ID = uint(ownerId)
+	user.ID = ownerId
 	g := db.Model(&user).Association("Urls").Append(&[]models.Url{*url})
 	if g.Error != nil {
 		log.Println("ERR ", g.Error)
