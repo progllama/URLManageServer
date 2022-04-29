@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"url_manager/app"
@@ -22,12 +23,15 @@ func (ctrl *SessionController) NewSession(c *gin.Context) {
 }
 
 func (ctrl *SessionController) CreateSession(c *gin.Context) {
+	fmt.Println("try bind")
 	var form forms.LoginForm
 	err := c.ShouldBind(&form)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
+
+	log.Println("success login.")
 
 	repo := repositories.NewUserRepository()
 	user, err := repo.FindByLoginId(form.LoginId)

@@ -16,11 +16,13 @@ func validate(params map[string]string) bool {
 }
 
 func build(params map[string]string) string {
-	return fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+	dns := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
 		params["host"],
 		params["port"],
 		params["user"],
 		params["dbname"],
 		params["password"],
 	)
+	fmt.Println(dns)
+	return dns
 }

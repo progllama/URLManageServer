@@ -1,9 +1,5 @@
 package configs
 
-import (
-	"github.com/joho/godotenv"
-)
-
 func LoadConfig() {
 	loadDotEnv()
 	loadDBConfig()
@@ -12,8 +8,8 @@ func LoadConfig() {
 }
 
 func loadDotEnv() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic(err)
-	}
+	// err := godotenv.Load(".env")
+	// if err != nil {
+	// 	panic(err)
+	// }
 }
