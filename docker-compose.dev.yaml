@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+  app:
+    tty: true
+    build:
+      context: .
+      dockerfile: ./docker-app-dev/Dockerfile
+    command: ""
+    working_dir: /home/app
+    volumes:
+      - ./src:/go/src/app
