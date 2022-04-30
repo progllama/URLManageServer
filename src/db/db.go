@@ -1,6 +1,7 @@
 package db
 
 import (
+	"time"
 	"url_manager/app/models"
 
 	"github.com/jinzhu/gorm"
@@ -17,6 +18,7 @@ func GetDB() *gorm.DB {
 }
 
 func Open(database string, dsn string) {
+	time.Sleep(10 * time.Second)
 	db, err = gorm.Open(database, dsn)
 	if err != nil {
 		panic(err)

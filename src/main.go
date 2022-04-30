@@ -2,12 +2,15 @@ package main
 
 import (
 	"log"
+	"time"
 	"url_manager/configs"
 	"url_manager/db"
 	"url_manager/server"
 )
 
 func main() {
+	time.Sleep(10 * time.Second)
+
 	log.SetFlags(log.Llongfile)
 
 	configs.LoadConfig()

@@ -9,12 +9,13 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
 
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: ./main
     ports:
       - 8000:8000
     working_dir: /app
-    volumes:
-      - ./src:/app
     environment:
       DBMS: postgres
       HOST: postgres

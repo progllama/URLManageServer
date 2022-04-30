@@ -33,6 +33,9 @@ func ServeFavicon(path string) gin.HandlerFunc {
 	info, err := os.Stat(path)
 	// エラーでないもしくは情報がないもしくはディレクトリなら終了
 	if err != nil || info == nil || info.IsDir() {
+		if err != nil {
+			panic(err)
+		}
 		panic("Invalid favicon path: " + path)
 	}
 
