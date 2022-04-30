@@ -10,15 +10,18 @@ import (
 )
 
 type UserRepository struct {
+	db *gorm.DB
 }
 
 func NewUserRepository() *UserRepository {
-	return &UserRepository{}
+	return &UserRepository{
+		db: db.GetDB(),
+	}
 }
 
 func (repo *UserRepository) All() ([]models.User, error) {
 	var users []models.User
-	dbResult := repo.getDB().Table("users").Select("*").Find(&users)
+	dbResult := repo.db.Table("users").Select("*").Find(&users)
 
 	if dbResult.Error == nil {
 		return users, nil
@@ -29,7 +32,7 @@ func (repo *UserRepository) All() ([]models.User, error) {
 
 func (repo *UserRepository) Find(condition models.User) ([]models.User, error) {
 	var users []models.User
-	dbResult := repo.getDB().Where(&condition).Find(&users)
+	dbResult := repo.db.Where(&condition).Find(&users)
 
 	if dbResult.Error == nil {
 		return users, nil
@@ -83,7 +86,7 @@ type SafeUser struct {
 
 func (repo *UserRepository) AllIdAndNames() ([]SafeUser, error) {
 	var users []SafeUser
-	dbResult := repo.getDB().Table("users").Find(&users)
+	dbResult := repo.db.Table("users").Find(&users)
 
 	if dbResult.Error != nil {
 		return make([]SafeUser, 0), dbResult.Error
@@ -104,7 +107,7 @@ func (repo *UserRepository) Create(name string, loginId string, password string)
 	}
 	user.Password = hashPass
 
-	dbResult := repo.getDB().Create(&user)
+	dbResult := repo.db.Create(&user)
 	return dbResult.Error
 }
 
@@ -115,7 +118,7 @@ func (repo *UserRepository) Update(id int, name string, loginId string, password
 		LoginId:  loginId,
 		Password: password,
 	}
-	dbResult := repo.getDB().Updates(u)
+	dbResult := repo.db.Updates(u)
 
 	if dbResult != nil {
 		return dbResult.Error
@@ -126,14 +129,14 @@ func (repo *UserRepository) Update(id int, name string, loginId string, password
 
 func (repo *UserRepository) Delete(id int) error {
 	var user models.User
-	dbResult := repo.getDB().Where("id=?", id).Delete(&user)
+	dbResult := repo.db.Where("id=?", id).Delete(&user)
 	return dbResult.Error
 }
 
 func (repo *UserRepository) Exists(condition models.User) (bool, error) {
 	var users []models.User
 	log.Println(condition)
-	dbResult := repo.getDB().Where(&condition).Limit(1).First(&users)
+	dbResult := repo.db.Where(&condition).Limit(1).First(&users)
 	if dbResult.Error != nil {
 		return false, dbResult.Error
 	}
@@ -146,8 +149,4 @@ func (repo *UserRepository) Exists(condition models.User) (bool, error) {
 		log.Println(len(users))
 		return false, nil
 	}
-}
-
-func (repo *UserRepository) getDB() *gorm.DB {
-	return db.GetDB()
 }
