@@ -9,7 +9,22 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+type IUserRepository interface {
+	All() (models.User, error)
+	AllIdName() (SafeUser, error)
+	FindById(int) (models.User, error)
+	FindByName(string) (models.User, error)
+	FindByLoginId(string) (models.User, error)
+	Create(name, loginId, password string) (models.User, error)
+	Update(id int, name, login, password string) (models.User, error)
+	Delete(id int) error
+	HasUserId(int) (bool, error)
+	HasUserName(string) (bool, error)
+	HasUserLoginId(string) (bool, error)
+}
+
 type UserRepository struct {
+	IUserRepository
 	db *gorm.DB
 }
 
@@ -30,21 +45,26 @@ func (repo *UserRepository) All() ([]models.User, error) {
 	}
 }
 
-func (repo *UserRepository) Find(condition models.User) ([]models.User, error) {
-	var users []models.User
-	dbResult := repo.db.Where(&condition).Find(&users)
+type SafeUser struct {
+	Name string
+	ID   string
+}
 
-	if dbResult.Error == nil {
-		return users, nil
-	} else {
-		return []models.User{}, dbResult.Error
+func (repo *UserRepository) AllWithIdName() ([]SafeUser, error) {
+	var users []SafeUser
+	dbResult := repo.db.Table("users").Find(&users)
+
+	if dbResult.Error != nil {
+		return make([]SafeUser, 0), dbResult.Error
 	}
+
+	return users, nil
 }
 
 func (repo *UserRepository) FindById(id int) (models.User, error) {
 	fmt.Println(id)
 	var user models.User
-	dbResult := db.GetDB().Where("id=?", id).First(&user)
+	dbResult := repo.db.Where("id=?", id).First(&user)
 
 	log.Println(id)
 
@@ -57,7 +77,7 @@ func (repo *UserRepository) FindById(id int) (models.User, error) {
 
 func (repo *UserRepository) FindByName(name string) (models.User, error) {
 	var user models.User
-	dbResult := db.GetDB().Where("name=?", name).First(&user)
+	dbResult := repo.db.Where("name=?", name).First(&user)
 
 	if dbResult.Error == nil {
 		return user, nil
@@ -68,31 +88,13 @@ func (repo *UserRepository) FindByName(name string) (models.User, error) {
 
 func (repo *UserRepository) FindByLoginId(loginId string) (models.User, error) {
 	var user models.User
-	dbResult := db.GetDB().Where("login_id=?", loginId).First(&user)
-
-	log.Println(db.GetDB().Model(&models.User{}))
+	dbResult := repo.db.Where("login_id=?", loginId).First(&user)
 
 	if dbResult.Error == nil {
 		return user, nil
 	} else {
 		return models.User{}, dbResult.Error
 	}
-}
-
-type SafeUser struct {
-	Name string
-	ID   string
-}
-
-func (repo *UserRepository) AllIdAndNames() ([]SafeUser, error) {
-	var users []SafeUser
-	dbResult := repo.db.Table("users").Find(&users)
-
-	if dbResult.Error != nil {
-		return make([]SafeUser, 0), dbResult.Error
-	}
-
-	return users, nil
 }
 
 func (repo *UserRepository) Create(name string, loginId string, password string) error {
@@ -118,7 +120,7 @@ func (repo *UserRepository) Update(id int, name string, loginId string, password
 		LoginId:  loginId,
 		Password: password,
 	}
-	dbResult := repo.db.Updates(u)
+	dbResult := repo.db.Model(&models.User{}).Updates(u)
 
 	if dbResult != nil {
 		return dbResult.Error
@@ -136,7 +138,7 @@ func (repo *UserRepository) Delete(id int) error {
 func (repo *UserRepository) Exists(condition models.User) (bool, error) {
 	var users []models.User
 	log.Println(condition)
-	dbResult := repo.db.Where(&condition).Limit(1).First(&users)
+	dbResult := repo.db.Select("id").Where(&condition).Limit(1).Take(&users)
 	if dbResult.Error != nil {
 		return false, dbResult.Error
 	}

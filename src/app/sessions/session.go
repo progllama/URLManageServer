@@ -1,4 +1,4 @@
-package app
+package sessions
 
 import (
 	"errors"
@@ -16,6 +16,17 @@ type Session interface {
 	SetUserId(int)
 	GetUserId() int
 	Clear()
+}
+
+type SessionFactory interface {
+	Create(c *gin.Context) Session
+}
+
+type RedisSessionFactory struct {
+}
+
+func (factory *RedisSessionFactory) Create(c *gin.Context) Session {
+	return NewRedisSession(c)
 }
 
 type RedisSession struct {

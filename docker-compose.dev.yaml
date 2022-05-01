@@ -7,6 +7,6 @@ services:
       context: .
       dockerfile: ./docker-app-dev/Dockerfile
     command: ""
-    working_dir: /home/app
+    working_dir: /go/src/app
     volumes:
       - ./src:/go/src/app

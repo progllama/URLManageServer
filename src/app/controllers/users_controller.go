@@ -6,10 +6,9 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"url_manager/app"
 	"url_manager/app/forms"
-	"url_manager/app/models"
 	"url_manager/app/repositories"
+	"url_manager/app/sessions"
 	"url_manager/app/uris"
 
 	"github.com/gin-gonic/gin"
@@ -20,23 +19,25 @@ var (
 )
 
 type UsersController struct {
-	repo *repositories.UserRepository
+	repo           *repositories.IUserRepository
+	sessionFactory *sessions.SessionFactory
 }
 
-func NewUserController() *UsersController {
+func NewUserController(r *repositories.IUserRepository, sf *sessions.SessionFactory) *UsersController {
 	return &UsersController{
-		repo: repositories.NewUserRepository(),
+		repo:           r,
+		sessionFactory: sf,
 	}
 }
 
 func (ctrl *UsersController) ShowAll(c *gin.Context) {
-	users, err := ctrl.repo.AllIdAndNames()
+	users, err := (*ctrl.repo).AllIdName()
 	if err != nil {
 		c.Error(err)
 		return
 	}
 
-	session := app.NewRedisSession(c)
+	session := sessions.NewRedisSession(c)
 	login := session.HasUserId()
 
 	c.HTML(
@@ -57,14 +58,14 @@ func (ctrl *UsersController) Show(ctx *gin.Context) {
 		return
 	}
 
-	user, err := ctrl.repo.FindById(userId)
+	user, err := (*ctrl.repo).FindById(userId)
 	if err != nil {
 		log.Fatal(err)
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	session := app.NewRedisSession(ctx)
+	session := sessions.NewRedisSession(ctx)
 	login := session.HasUserId()
 
 	ctx.HTML(
@@ -79,7 +80,7 @@ func (ctrl *UsersController) Show(ctx *gin.Context) {
 }
 
 func (ctrl *UsersController) extractUserId(ctx *gin.Context) (int, error) {
-	session := app.NewRedisSession(ctx)
+	session := sessions.NewRedisSession(ctx)
 	if session.HasUserId() {
 		return session.GetUserId(), nil
 	}
@@ -94,7 +95,7 @@ func (ctrl *UsersController) extractUserId(ctx *gin.Context) (int, error) {
 }
 
 func (ctrl *UsersController) New(c *gin.Context) {
-	session := app.NewRedisSession(c)
+	session := sessions.NewRedisSession(c)
 
 	c.HTML(
 		http.StatusOK,
@@ -117,7 +118,7 @@ func (ctrl *UsersController) Create(c *gin.Context) {
 
 	log.Println("Success form binding.")
 
-	exist, err := ctrl.repo.Exists(models.User{Name: form.Name})
+	exist, err := (*ctrl.repo).HasUserName(form.Name)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -129,7 +130,7 @@ func (ctrl *UsersController) Create(c *gin.Context) {
 
 	log.Println("Name is unique.")
 
-	err = ctrl.repo.Create(form.Name, form.LoginId, form.Password)
+	_, err = (*ctrl.repo).Create(form.Name, form.LoginId, form.Password)
 	if err != nil {
 		c.Error(err)
 		return
@@ -141,7 +142,7 @@ func (ctrl *UsersController) Create(c *gin.Context) {
 }
 
 func (ctrl *UsersController) Edit(c *gin.Context) {
-	session := app.NewRedisSession(c)
+	session := sessions.NewRedisSession(c)
 	c.HTML(http.StatusOK, "edit_user.html", gin.H{"login": session.HasUserId()})
 }
 
@@ -156,7 +157,7 @@ func (ctrl *UsersController) Update(c *gin.Context) {
 		return
 	}
 
-	ctrl.repo.Update(uri.ToInt(), form.Name, form.LoginId, form.Password)
+	(*ctrl.repo).Update(uri.ToInt(), form.Name, form.LoginId, form.Password)
 	if err != nil {
 		c.Error(err)
 	}
@@ -168,7 +169,7 @@ func (ctrl *UsersController) Delete(c *gin.Context) {
 	var uri uris.UserUri
 	c.ShouldBind(uri)
 
-	if err := ctrl.repo.Delete(uri.ToInt()); err != nil {
+	if err := (*ctrl.repo).Delete(uri.ToInt()); err != nil {
 		return
 	}
 
