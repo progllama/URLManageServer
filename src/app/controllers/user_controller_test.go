@@ -10,15 +10,30 @@ import (
 )
 
 func TestNewUser(t *testing.T) {
-	router := gin.Default()
-	ctrl := NewUserController()
+	rec := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(rec)
+	req, err := http.NewRequest("GET", "/users", nil)
+	if err != nil {
+		t.Error(err)
+	}
 
-	router.GET("/users/new", ctrl.New)
+	ctx.Request = req
+	asserts := assert.New(t)
 
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/users/new", nil)
-	router.ServeHTTP(w, req)
+	ctrl := NewUserController(nil, nil)
+	ctrl.New(ctx)
 
-	assert.Equal(t, 200, w.Code)
+	asserts.Equal(t, 200, rec.Code)
+
+	// router := gin.Default()
+	// ctrl := NewUserController()
+
+	// router.GET("/users/new", ctrl.New)
+
+	// w := httptest.NewRecorder()
+	// req, _ := http.NewRequest("GET", "/users/new", nil)
+	// router.ServeHTTP(w, req)
+
+	// assert.Equal(t, 200, w.Code)
 	// assert.Equal(t, "pong", w.Body.String())
 }

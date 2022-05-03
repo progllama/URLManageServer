@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"url_manager/app"
 	"url_manager/app/forms"
 	"url_manager/app/repositories"
+	"url_manager/app/session"
 
 	"github.com/gin-gonic/gin"
 )
@@ -59,8 +59,8 @@ func (ctrl *SessionController) DestroySession(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"result": "success"})
 }
 
-func (ctrl *SessionController) getNewSession(c *gin.Context) app.Session {
-	return app.NewRedisSession(c)
+func (ctrl *SessionController) getNewSession(c *gin.Context) session.Session {
+	return session.NewRedisSession(c)
 }
 
 func (ctrl *SessionController) redirectToSignUp(c *gin.Context) {

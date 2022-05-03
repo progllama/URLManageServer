@@ -1,33 +1,9 @@
-package sessions
+package session
 
 import (
-	"errors"
-
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
-
-var (
-	ErrKeyNotFound = errors.New("キーが見つかりませんでした。")
-)
-
-type Session interface {
-	HasUserId() bool
-	SetUserId(int)
-	GetUserId() int
-	Clear()
-}
-
-type SessionFactory interface {
-	Create(c *gin.Context) Session
-}
-
-type RedisSessionFactory struct {
-}
-
-func (factory *RedisSessionFactory) Create(c *gin.Context) Session {
-	return NewRedisSession(c)
-}
 
 type RedisSession struct {
 	s sessions.Session

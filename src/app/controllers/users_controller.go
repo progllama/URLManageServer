@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"url_manager/app/forms"
 	"url_manager/app/repositories"
-	"url_manager/app/sessions"
+	"url_manager/app/session"
 	"url_manager/app/uris"
 
 	"github.com/gin-gonic/gin"
@@ -20,10 +20,10 @@ var (
 
 type UsersController struct {
 	repo           *repositories.IUserRepository
-	sessionFactory *sessions.SessionFactory
+	sessionFactory *session.SessionFactory
 }
 
-func NewUserController(r *repositories.IUserRepository, sf *sessions.SessionFactory) *UsersController {
+func NewUserController(r *repositories.IUserRepository, sf *session.SessionFactory) *UsersController {
 	return &UsersController{
 		repo:           r,
 		sessionFactory: sf,
@@ -37,7 +37,7 @@ func (ctrl *UsersController) ShowAll(c *gin.Context) {
 		return
 	}
 
-	session := sessions.NewRedisSession(c)
+	session := session.NewRedisSession(c)
 	login := session.HasUserId()
 
 	c.HTML(
@@ -65,7 +65,7 @@ func (ctrl *UsersController) Show(ctx *gin.Context) {
 		return
 	}
 
-	session := sessions.NewRedisSession(ctx)
+	session := session.NewRedisSession(ctx)
 	login := session.HasUserId()
 
 	ctx.HTML(
@@ -80,7 +80,7 @@ func (ctrl *UsersController) Show(ctx *gin.Context) {
 }
 
 func (ctrl *UsersController) extractUserId(ctx *gin.Context) (int, error) {
-	session := sessions.NewRedisSession(ctx)
+	session := session.NewRedisSession(ctx)
 	if session.HasUserId() {
 		return session.GetUserId(), nil
 	}
@@ -95,7 +95,7 @@ func (ctrl *UsersController) extractUserId(ctx *gin.Context) (int, error) {
 }
 
 func (ctrl *UsersController) New(c *gin.Context) {
-	session := sessions.NewRedisSession(c)
+	session := session.NewRedisSession(c)
 
 	c.HTML(
 		http.StatusOK,
@@ -142,7 +142,7 @@ func (ctrl *UsersController) Create(c *gin.Context) {
 }
 
 func (ctrl *UsersController) Edit(c *gin.Context) {
-	session := sessions.NewRedisSession(c)
+	session := session.NewRedisSession(c)
 	c.HTML(http.StatusOK, "edit_user.html", gin.H{"login": session.HasUserId()})
 }
 

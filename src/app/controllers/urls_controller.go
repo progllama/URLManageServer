@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"url_manager/app/forms"
 	"url_manager/app/models"
-	"url_manager/app/sessions"
+	"url_manager/app/session"
 
 	"url_manager/app/repositories"
 
@@ -51,7 +51,7 @@ func ShowURLs(c *gin.Context) {
 		return
 	}
 
-	session := sessions.NewRedisSession(c)
+	session := session.NewRedisSession(c)
 
 	c.HTML(
 		http.StatusOK,
@@ -66,7 +66,7 @@ func ShowURLs(c *gin.Context) {
 }
 
 func ShowURL(c *gin.Context) {
-	session := sessions.NewRedisSession(c)
+	session := session.NewRedisSession(c)
 	c.HTML(
 		http.StatusOK,
 		"show_url.html",
@@ -79,7 +79,7 @@ func ShowURL(c *gin.Context) {
 func NewURL(c *gin.Context) {
 	var uri UrlsUri
 	c.ShouldBindUri(&uri)
-	session := sessions.NewRedisSession(c)
+	session := session.NewRedisSession(c)
 
 	c.HTML(
 		http.StatusOK,
@@ -99,7 +99,7 @@ func CreateURL(c *gin.Context) {
 	var form forms.UrlCreateForm
 	c.ShouldBind(&form)
 
-	session := sessions.NewRedisSession(c)
+	session := session.NewRedisSession(c)
 	session.HasUserId()
 
 	if !session.HasUserId() {
@@ -138,7 +138,7 @@ func CreateURL(c *gin.Context) {
 }
 
 func EditURL(c *gin.Context) {
-	session := sessions.NewRedisSession(c)
+	session := session.NewRedisSession(c)
 	c.HTML(
 		http.StatusOK,
 		"edit_url.html",
