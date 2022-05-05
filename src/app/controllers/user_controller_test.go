@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// apiのテストならレスポンスも確かめたほうがいいかも?
 func TestNewUser(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(rec)
@@ -24,16 +25,4 @@ func TestNewUser(t *testing.T) {
 	ctrl.New(ctx)
 
 	asserts.Equal(t, 200, rec.Code)
-
-	// router := gin.Default()
-	// ctrl := NewUserController()
-
-	// router.GET("/users/new", ctrl.New)
-
-	// w := httptest.NewRecorder()
-	// req, _ := http.NewRequest("GET", "/users/new", nil)
-	// router.ServeHTTP(w, req)
-
-	// assert.Equal(t, 200, w.Code)
-	// assert.Equal(t, "pong", w.Body.String())
 }
