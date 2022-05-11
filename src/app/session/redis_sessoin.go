@@ -10,12 +10,12 @@ type RedisSession struct {
 }
 
 func (rs *RedisSession) HasUserId() bool {
-	userId := rs.s.Get(rs.getUserIdKeyName())
+	userId := rs.s.Get(USER_ID)
 	return userId != nil
 }
 
 func (rs *RedisSession) SetUserId(userId int) {
-	rs.s.Set(rs.getUserIdKeyName(), userId)
+	rs.s.Set(USER_ID, userId)
 	err := rs.s.Save()
 	if err != nil {
 		panic(err)
@@ -23,7 +23,7 @@ func (rs *RedisSession) SetUserId(userId int) {
 }
 
 func (rs *RedisSession) GetUserId() int {
-	userId := rs.s.Get(rs.getUserIdKeyName())
+	userId := rs.s.Get(USER_ID)
 	if userId == nil {
 		panic(ErrKeyNotFound)
 	}
@@ -35,14 +35,20 @@ func (rs *RedisSession) Clear() {
 	rs.s.Save()
 }
 
-func (rs *RedisSession) getUserIdKeyName() string {
-	// こういう書き方をすると値を書き換えるたびに再コンパイルが必要になってしまうが。このぐらいは問題なしとする。
-	return "user_id"
-}
-
 func NewRedisSession(ctx *gin.Context) *RedisSession {
 	session := sessions.Default(ctx)
 	return &RedisSession{
 		s: session,
 	}
+}
+
+type RedisSessionFactory struct {
+}
+
+func (factory *RedisSessionFactory) Create(c *gin.Context) Session {
+	return NewRedisSession(c)
+}
+
+func NewRedisSessionFactory() *RedisSessionFactory {
+	return &RedisSessionFactory{}
 }

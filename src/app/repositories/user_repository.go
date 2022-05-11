@@ -1,30 +1,30 @@
 package repositories
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"url_manager/app/models"
 	"url_manager/db"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type IUserRepository interface {
-	All() (models.User, error)
-	AllIdName() (SafeUser, error)
+	All() ([]models.User, error)
+	AllIdName() ([]SafeUser, error)
 	FindById(int) (models.User, error)
 	FindByName(string) (models.User, error)
 	FindByLoginId(string) (models.User, error)
-	Create(name, loginId, password string) (models.User, error)
-	Update(id int, name, login, password string) (models.User, error)
+	Create(name, loginId, password string) error
+	Update(id int, name, login, password string) error
 	Delete(id int) error
-	HasUserId(int) (bool, error)
+	// HasUserId(int) (bool, error)
 	HasUserName(string) (bool, error)
-	HasUserLoginId(string) (bool, error)
+	// HasUserLoginId(string) (bool, error)
 }
 
 type UserRepository struct {
-	IUserRepository
 	db *gorm.DB
 }
 
@@ -50,7 +50,7 @@ type SafeUser struct {
 	ID   string
 }
 
-func (repo *UserRepository) AllWithIdName() ([]SafeUser, error) {
+func (repo *UserRepository) AllIdName() ([]SafeUser, error) {
 	var users []SafeUser
 	dbResult := repo.db.Table("users").Find(&users)
 
@@ -135,11 +135,10 @@ func (repo *UserRepository) Delete(id int) error {
 	return dbResult.Error
 }
 
-func (repo *UserRepository) Exists(condition models.User) (bool, error) {
+func (repo *UserRepository) HasUserName(name string) (bool, error) {
 	var users []models.User
-	log.Println(condition)
-	dbResult := repo.db.Select("id").Where(&condition).Limit(1).Take(&users)
-	if dbResult.Error != nil {
+	dbResult := repo.db.Select("id").Where("name=?", name).Limit(1).Take(&users)
+	if !errors.Is(dbResult.Error, gorm.ErrRecordNotFound) && dbResult.Error != nil {
 		return false, dbResult.Error
 	}
 

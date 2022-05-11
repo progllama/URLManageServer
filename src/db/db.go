@@ -1,11 +1,12 @@
 package db
 
 import (
-	"time"
 	"url_manager/app/models"
 
-	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 var (
@@ -17,16 +18,24 @@ func GetDB() *gorm.DB {
 	return db
 }
 
+func OpenSqlite() {
+	db, err = gorm.Open(sqlite.Open("test.db"))
+}
+
 func Open(database string, dsn string) {
-	time.Sleep(10 * time.Second)
-	db, err = gorm.Open(database, dsn)
+	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
 }
 
 func Close() {
-	err = db.Close()
+	connection, err := db.DB()
+	if err != nil {
+		panic(err)
+	}
+
+	err = connection.Close()
 	if err != nil {
 		panic(err)
 	}

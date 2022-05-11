@@ -3,14 +3,14 @@ package middlewares
 import (
 	"log"
 	"net/http"
-	"url_manager/app"
+	"url_manager/app/session"
 
 	"github.com/gin-gonic/gin"
 )
 
 func RequireLogin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		session := app.NewRedisSession(c)
+		session := session.NewRedisSession(c)
 
 		if session.HasUserId() {
 			c.Next()

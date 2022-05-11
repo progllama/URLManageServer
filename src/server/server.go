@@ -3,10 +3,17 @@ package server
 import (
 	"url_manager/app/controllers"
 	"url_manager/app/middlewares"
+	"url_manager/app/repositories"
+	"url_manager/app/session"
 
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
+	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
+)
+
+// settings
+var (
+	sessionFactory = session.NewMemSessionFactory()
 )
 
 func Open(port string) {
@@ -15,13 +22,16 @@ func Open(port string) {
 	router.LoadHTMLGlob("app/templates/**/*")
 	router.Static("/css", "app/assets/css")
 	router.Static("/js", "app/assets/js")
-	router.Static("favcion.ico", "app/assets/favicon.ico")
+	router.Static("favicon.ico", "app/assets/favicon.ico")
 
-	store, err := redis.NewStore(10, "tcp", "redis:6379", "", []byte("32bytes-secret-auth-key"))
-	if err != nil {
-		panic(err)
-	}
-	router.Use(sessions.Sessions("URLManager", store))
+	// store, err := redis.NewStore(10, "tcp", "redis:6379", "", []byte("32bytes-secret-auth-key"))
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// router.Use(sessions.Sessions("URLManager", store))
+
+	store := memstore.NewStore([]byte("secret"))
+	router.Use(sessions.Sessions("mysession", store))
 
 	router.Use(middlewares.ServeFavicon("./favicon.ico"))
 
@@ -66,7 +76,7 @@ func Open(port string) {
 
 	users := router.Group("/users")
 	{
-		ctrl := controllers.NewUserController()
+		ctrl := controllers.NewUserController(repositories.NewUserRepository(), sessionFactory)
 		users.GET("", ctrl.ShowAll)
 		users.GET("/:id", ctrl.Show)
 		users.GET("/new", ctrl.New)

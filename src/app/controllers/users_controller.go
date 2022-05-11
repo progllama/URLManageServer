@@ -19,11 +19,11 @@ var (
 )
 
 type UsersController struct {
-	repo           *repositories.IUserRepository
-	sessionFactory *session.SessionFactory
+	repo           repositories.IUserRepository
+	sessionFactory session.SessionFactory
 }
 
-func NewUserController(r *repositories.IUserRepository, sf *session.SessionFactory) *UsersController {
+func NewUserController(r repositories.IUserRepository, sf session.SessionFactory) *UsersController {
 	return &UsersController{
 		repo:           r,
 		sessionFactory: sf,
@@ -31,7 +31,9 @@ func NewUserController(r *repositories.IUserRepository, sf *session.SessionFacto
 }
 
 func (ctrl *UsersController) ShowAll(c *gin.Context) {
-	users, err := (*ctrl.repo).AllIdName()
+	log.Println(ctrl)
+	log.Println(ctrl.repo == nil)
+	users, err := ctrl.repo.AllIdName()
 	if err != nil {
 		c.Error(err)
 		return
@@ -58,7 +60,7 @@ func (ctrl *UsersController) Show(ctx *gin.Context) {
 		return
 	}
 
-	user, err := (*ctrl.repo).FindById(userId)
+	user, err := ctrl.repo.FindById(userId)
 	if err != nil {
 		log.Fatal(err)
 		ctx.AbortWithStatus(http.StatusInternalServerError)
@@ -118,19 +120,20 @@ func (ctrl *UsersController) Create(c *gin.Context) {
 
 	log.Println("Success form binding.")
 
-	exist, err := (*ctrl.repo).HasUserName(form.Name)
+	exist, err := ctrl.repo.HasUserName(form.Name)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	if exist {
 		log.Println("Name is not unique.")
+		c.Redirect(http.StatusFound, "/users/new")
 		return
 	}
 
 	log.Println("Name is unique.")
 
-	_, err = (*ctrl.repo).Create(form.Name, form.LoginId, form.Password)
+	err = ctrl.repo.Create(form.Name, form.LoginId, form.Password)
 	if err != nil {
 		c.Error(err)
 		return
@@ -157,7 +160,7 @@ func (ctrl *UsersController) Update(c *gin.Context) {
 		return
 	}
 
-	(*ctrl.repo).Update(uri.ToInt(), form.Name, form.LoginId, form.Password)
+	ctrl.repo.Update(uri.ToInt(), form.Name, form.LoginId, form.Password)
 	if err != nil {
 		c.Error(err)
 	}
@@ -169,7 +172,7 @@ func (ctrl *UsersController) Delete(c *gin.Context) {
 	var uri uris.UserUri
 	c.ShouldBind(uri)
 
-	if err := (*ctrl.repo).Delete(uri.ToInt()); err != nil {
+	if err := ctrl.repo.Delete(uri.ToInt()); err != nil {
 		return
 	}
 

@@ -8,8 +8,8 @@ import (
 )
 
 // type URLRepository interface {
-// 	GetByUserID(int) ([]models.URL, error)
-// 	GetByID(int) (models.URL, error)
+// 	FindByUserID(int) ([]models.URL, error)
+// 	FindByID(int) (models.URL, error)
 // 	Create(models.URL) error
 // 	Update(models.URL) error
 // 	Destory(models.URL) error
@@ -45,11 +45,7 @@ func (repo PostgreSQLURLRepository) FindByUserID(id int) ([]models.Url, error) {
 	var user models.User
 	user.ID = id
 	var urls []models.Url
-	fmt.Println(id)
-	fmt.Println(db.Model(&user).Error)
-	fmt.Println(db.Model(&user).Where("id=?", id).Error)
-	fmt.Println(db.Model(&user).Where("id=?", id).Association("Urls").Find(&urls).Error)
-	if err := db.Model(&user).Association("Urls").Find(&urls).Error; err != nil {
+	if err := db.Model(&user).Association("Urls").Find(&urls); err != nil {
 		fmt.Println(err)
 		return []models.Url{}, err
 	}
@@ -80,10 +76,10 @@ func (repo PostgreSQLURLRepository) Create(ownerId int, url *models.Url) error {
 
 	user := models.User{}
 	user.ID = ownerId
-	g := db.Model(&user).Association("Urls").Append(&[]models.Url{*url})
-	if g.Error != nil {
-		log.Println("ERR ", g.Error)
-		return g.Error
+	err := db.Model(&user).Association("Urls").Append(&[]models.Url{*url})
+	if err != nil {
+		log.Println("ERR ", err)
+		return err
 	}
 
 	return nil
@@ -95,7 +91,7 @@ func (repo PostgreSQLURLRepository) Update(url models.Url) error {
 		return db.Error
 	}
 
-	g := db.Update(&url)
+	g := db.Updates(&url)
 	if g.Error != nil {
 		return g.Error
 	}
