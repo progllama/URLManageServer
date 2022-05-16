@@ -68,7 +68,7 @@ func Open(port string) {
 	// }))
 
 	{
-		ctrl := controllers.NewSessionController()
+		ctrl := controllers.NewSessionController(repositories.GormNewUserRepository())
 		router.GET("/login", ctrl.NewSession)
 		router.POST("/login", ctrl.CreateSession)
 		router.DELETE("/logout", ctrl.DestroySession)
@@ -76,7 +76,7 @@ func Open(port string) {
 
 	users := router.Group("/users")
 	{
-		ctrl := controllers.NewUserController(repositories.NewUserRepository(), sessionFactory)
+		ctrl := controllers.NewUserController(repositories.GormNewUserRepository(), sessionFactory)
 		users.GET("", ctrl.ShowAll)
 		users.GET("/:id", ctrl.Show)
 		users.GET("/new", ctrl.New)
@@ -90,13 +90,14 @@ func Open(port string) {
 
 		urls := users.Group("/:id/urls")
 		{
-			urls.GET("", controllers.ShowURLs)
-			urls.GET("/:url_id", controllers.ShowURL)
-			urls.GET("/new", middlewares.RequireLogin(), controllers.NewURL)
-			urls.POST("", middlewares.RequireLogin(), controllers.CreateURL)
-			urls.GET("/:url_id/edit", middlewares.RequireLogin(), controllers.EditURL)
-			urls.PUT("/:url_id", middlewares.RequireLogin(), controllers.UpdateURL)
-			urls.DELETE("/:url_id", middlewares.RequireLogin(), controllers.DeleteURL)
+			ctrl := controllers.NewUrlsController(repositories.GormNewUserRepository())
+			urls.GET("", ctrl.ShowURLs)
+			urls.GET("/:url_id", ctrl.ShowURL)
+			urls.GET("/new", middlewares.RequireLogin(), ctrl.NewURL)
+			urls.POST("", middlewares.RequireLogin(), ctrl.CreateURL)
+			urls.GET("/:url_id/edit", middlewares.RequireLogin(), ctrl.EditURL)
+			urls.PUT("/:url_id", middlewares.RequireLogin(), ctrl.UpdateURL)
+			urls.DELETE("/:url_id", middlewares.RequireLogin(), ctrl.DeleteURL)
 		}
 	}
 

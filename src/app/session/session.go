@@ -13,6 +13,7 @@ var (
 const USER_ID = "user_id"
 
 type Session interface {
+	ID() string
 	HasUserId() bool
 	SetUserId(int)
 	GetUserId() int

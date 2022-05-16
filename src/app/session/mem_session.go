@@ -9,6 +9,10 @@ type MemSession struct {
 	s sessions.Session
 }
 
+func (s *MemSession) ID() string {
+	return s.s.ID()
+}
+
 func (s *MemSession) HasUserId() bool {
 	userId := s.s.Get(USER_ID)
 	return userId != nil

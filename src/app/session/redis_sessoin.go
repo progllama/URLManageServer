@@ -9,6 +9,10 @@ type RedisSession struct {
 	s sessions.Session
 }
 
+func (s *RedisSession) ID() string {
+	return s.s.ID()
+}
+
 func (rs *RedisSession) HasUserId() bool {
 	userId := rs.s.Get(USER_ID)
 	return userId != nil

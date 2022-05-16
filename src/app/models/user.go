@@ -1,7 +1,6 @@
 package models
 
 import (
-	"log"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -19,12 +18,7 @@ type User struct {
 
 func (user *User) Authenticate(loginId string, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil {
-		log.Fatal(err)
-		return false
-	}
-
-	return true
+	return err == nil
 }
 
 // TODO パスワードのハッシュ化はこの構造体の責務"オブジェクトの永続化"でないので移動する。

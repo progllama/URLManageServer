@@ -8,11 +8,10 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
+	"github.com/go-playground/assert/v2"
 )
 
-// apiのテストならレスポンスも確かめたほうがいいかも?
-func TestNewUserSuccess(t *testing.T) {
+func TestNewUrlSuccess(t *testing.T) {
 	// config.
 	method := "GET"
 	url := "/session/new"
@@ -34,8 +33,8 @@ func TestNewUserSuccess(t *testing.T) {
 	}
 
 	// set route.
-	// ctrl := New
-	// r.GET(url, ctrl.NewSession)
+	ctrl := NewSessionController(nil)
+	r.GET(url, ctrl.NewSession)
 
 	// call
 	r.ServeHTTP(w, req)

@@ -19,11 +19,11 @@ var (
 )
 
 type UsersController struct {
-	repo           repositories.IUserRepository
+	repo           repositories.UserRepository
 	sessionFactory session.SessionFactory
 }
 
-func NewUserController(r repositories.IUserRepository, sf session.SessionFactory) *UsersController {
+func NewUserController(r repositories.UserRepository, sf session.SessionFactory) *UsersController {
 	return &UsersController{
 		repo:           r,
 		sessionFactory: sf,

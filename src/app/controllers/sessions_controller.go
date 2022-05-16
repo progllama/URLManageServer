@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,10 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type SessionController struct{}
+type SessionController struct {
+	userRepository repositories.UserRepository
+}
 
-func NewSessionController() SessionController {
-	return SessionController{}
+func NewSessionController(userRepository repositories.UserRepository) *SessionController {
+	return &SessionController{userRepository}
 }
 
 func (ctrl *SessionController) NewSession(c *gin.Context) {
@@ -23,7 +24,9 @@ func (ctrl *SessionController) NewSession(c *gin.Context) {
 }
 
 func (ctrl *SessionController) CreateSession(c *gin.Context) {
-	fmt.Println("try bind")
+	// body, _ := ioutil.ReadAll(c.Request.Body)
+	// log.Println("Body: ", string(body))
+
 	var form forms.LoginForm
 	err := c.ShouldBind(&form)
 	if err != nil {
@@ -31,10 +34,7 @@ func (ctrl *SessionController) CreateSession(c *gin.Context) {
 		return
 	}
 
-	log.Println("success login.")
-
-	repo := repositories.NewUserRepository()
-	user, err := repo.FindByLoginId(form.LoginId)
+	user, err := ctrl.userRepository.FindByLoginId(form.LoginId)
 	if err != nil {
 		ctrl.redirectToSignUp(c)
 		return
@@ -47,20 +47,21 @@ func (ctrl *SessionController) CreateSession(c *gin.Context) {
 
 	session := ctrl.getNewSession(c)
 	session.SetUserId(int(user.ID))
-	fmt.Println("success", user.ID)
 
 	c.Redirect(http.StatusFound, "/users/"+strconv.Itoa(int(user.ID)))
 }
 
 func (ctrl *SessionController) DestroySession(c *gin.Context) {
 	session := ctrl.getNewSession(c)
+	session.SetUserId(3)
+	log.Println(session.ID())
 	session.Clear()
 
 	c.JSON(http.StatusOK, gin.H{"result": "success"})
 }
 
 func (ctrl *SessionController) getNewSession(c *gin.Context) session.Session {
-	return session.NewRedisSession(c)
+	return session.NewMemSession(c)
 }
 
 func (ctrl *SessionController) redirectToSignUp(c *gin.Context) {

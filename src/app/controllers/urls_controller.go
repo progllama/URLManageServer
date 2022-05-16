@@ -41,7 +41,15 @@ func (uri *UrlsUri) UrlIdAsInt() int {
 	return value
 }
 
-func ShowURLs(c *gin.Context) {
+type UrlsController struct {
+	userRepository repositories.UserRepository
+}
+
+func NewUrlsController(repo repositories.UserRepository) *UrlsController {
+	return &UrlsController{repo}
+}
+
+func (ctrl *UrlsController) ShowURLs(c *gin.Context) {
 	var uri UrlsUri
 	c.ShouldBindUri(&uri)
 
@@ -65,7 +73,7 @@ func ShowURLs(c *gin.Context) {
 	)
 }
 
-func ShowURL(c *gin.Context) {
+func (ctrl *UrlsController) ShowURL(c *gin.Context) {
 	session := session.NewRedisSession(c)
 	c.HTML(
 		http.StatusOK,
@@ -76,7 +84,7 @@ func ShowURL(c *gin.Context) {
 	)
 }
 
-func NewURL(c *gin.Context) {
+func (ctrl *UrlsController) NewURL(c *gin.Context) {
 	var uri UrlsUri
 	c.ShouldBindUri(&uri)
 	session := session.NewRedisSession(c)
@@ -91,7 +99,7 @@ func NewURL(c *gin.Context) {
 	)
 }
 
-func CreateURL(c *gin.Context) {
+func (ctrl *UrlsController) CreateURL(c *gin.Context) {
 	// リクエストからデータを抽出。
 	var uri UrlsUri
 	c.ShouldBindUri(&uri)
@@ -108,8 +116,7 @@ func CreateURL(c *gin.Context) {
 		return
 	}
 
-	urepo := repositories.NewUserRepository()
-	user, err := urepo.FindById(session.GetUserId())
+	user, err := ctrl.userRepository.FindById(session.GetUserId())
 	if err != nil {
 		log.Fatal("Can't find user. User id : ", session.GetUserId())
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -137,7 +144,7 @@ func CreateURL(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/users/"+uri.UserId+"/urls")
 }
 
-func EditURL(c *gin.Context) {
+func (ctrl *UrlsController) EditURL(c *gin.Context) {
 	session := session.NewRedisSession(c)
 	c.HTML(
 		http.StatusOK,
@@ -148,11 +155,11 @@ func EditURL(c *gin.Context) {
 	)
 }
 
-func UpdateURL(c *gin.Context) {
+func (ctrl *UrlsController) UpdateURL(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/urls")
 }
 
-func DeleteURL(c *gin.Context) {
+func (ctrl *UrlsController) DeleteURL(c *gin.Context) {
 	log.Println(c.Request.RequestURI)
 	var uri UrlsUri
 	c.ShouldBindUri(&uri)
