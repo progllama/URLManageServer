@@ -1,24 +1,49 @@
 package middlewares
 
 import (
-	"log"
-	"net/http"
-	"url_manager/app/session"
-
 	"github.com/gin-gonic/gin"
 )
 
-func RequireLogin() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := session.NewRedisSession(c)
+type SessionFactory interface {
+	Create(*gin.Context) Session
+}
 
-		if session.HasUserId() {
-			c.Next()
-			return
-		}
+type Session interface {
+	HasUserId() bool
+}
 
-		log.Println(" please login.")
-		c.Redirect(http.StatusFound, "/users")
-		c.Abort()
+type LoginRequireMiddleWare struct {
+	factory   SessionFactory
+	onSuccess func(*gin.Context)
+	onFail    func(*gin.Context)
+}
+
+func NewLoginRequireMiddleware(factory SessionFactory, onSuccess, onFail func(*gin.Context)) *LoginRequireMiddleWare {
+	return &LoginRequireMiddleWare{
+		factory,
+		onSuccess,
+		onFail,
 	}
+}
+
+func (mw *LoginRequireMiddleWare) Handler() gin.HandlerFunc {
+	if mw.factory == nil {
+		panic("Factory is nil.")
+	}
+	if mw.onSuccess == nil || mw.onFail == nil {
+		panic(`"onSuccess" and/or "onFail" is nil.`)
+	}
+
+	return func(ctx *gin.Context) {
+		session := mw.getSession(ctx)
+		if session.HasUserId() {
+			mw.onSuccess(ctx)
+		} else {
+			mw.onFail(ctx)
+		}
+	}
+}
+
+func (mw *LoginRequireMiddleWare) getSession(ctx *gin.Context) Session {
+	return mw.factory.Create(ctx)
 }
