@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// settings
+// dependency
 var (
 	sessionFactory = session.NewMemSessionFactory()
 )
@@ -67,6 +67,9 @@ func Open(port string) {
 	// 	MaxAge: 24 * time.Hour,
 	// }))
 
+	factory := session.NewMemSessionFactory()
+	lrm := middlewares.NewLoginRequireMiddleware(factory, middlewares.DoNothing, middlewares.RedirectToLoginPage)
+
 	{
 		ctrl := controllers.NewSessionController(repositories.GormNewUserRepository())
 		router.GET("/login", ctrl.NewSession)
@@ -81,25 +84,25 @@ func Open(port string) {
 		users.GET("/:id", ctrl.Show)
 		users.GET("/new", ctrl.New)
 		users.POST("", ctrl.Create)
-		users.GET("/:id/edit", middlewares.RequireLogin(), ctrl.Edit)
-		users.PUT("/:id", middlewares.RequireLogin(), ctrl.Update)
-		users.PATCH("/:id", middlewares.RequireLogin(), ctrl.Update)
-		users.DELETE("/:id", middlewares.RequireLogin(), ctrl.Delete)
+		users.GET("/:id/edit", lrm.RequireLogin(), ctrl.Edit)
+		users.PUT("/:id", lrm.RequireLogin(), ctrl.Update)
+		users.PATCH("/:id", lrm.RequireLogin(), ctrl.Update)
+		users.DELETE("/:id", lrm.RequireLogin(), ctrl.Delete)
 
-		router.GET("/", middlewares.RequireLogin(), ctrl.Show)
+		router.GET("/", lrm.RequireLogin(), ctrl.Show)
 
 		urls := users.Group("/:id/urls")
 		{
 			ctrl := controllers.NewUrlsController(repositories.GormNewUserRepository())
 			urls.GET("", ctrl.ShowURLs)
 			urls.GET("/:url_id", ctrl.ShowURL)
-			urls.GET("/new", middlewares.RequireLogin(), ctrl.NewURL)
-			urls.POST("", middlewares.RequireLogin(), ctrl.CreateURL)
-			urls.GET("/:url_id/edit", middlewares.RequireLogin(), ctrl.EditURL)
-			urls.PUT("/:url_id", middlewares.RequireLogin(), ctrl.UpdateURL)
-			urls.DELETE("/:url_id", middlewares.RequireLogin(), ctrl.DeleteURL)
+			urls.GET("/new", lrm.RequireLogin(), ctrl.NewURL)
+			urls.POST("", lrm.RequireLogin(), ctrl.CreateURL)
+			urls.GET("/:url_id/edit", lrm.RequireLogin(), ctrl.EditURL)
+			urls.PUT("/:url_id", lrm.RequireLogin(), ctrl.UpdateURL)
+			urls.DELETE("/:url_id", lrm.RequireLogin(), ctrl.DeleteURL)
 		}
 	}
 
-	router.Run(":8000")
+	router.Run(port)
 }

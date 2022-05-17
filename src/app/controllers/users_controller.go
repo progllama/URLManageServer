@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	ErrCantExtractUserId = errors.New("can't extract user id.")
+	ErrCantExtractUserId = errors.New("can't extract user id")
 )
 
 type UsersController struct {
@@ -31,8 +31,6 @@ func NewUserController(r repositories.UserRepository, sf session.SessionFactory)
 }
 
 func (ctrl *UsersController) ShowAll(c *gin.Context) {
-	log.Println(ctrl)
-	log.Println(ctrl.repo == nil)
 	users, err := ctrl.repo.AllIdName()
 	if err != nil {
 		c.Error(err)

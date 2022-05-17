@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 	"url_manager/app/forms"
@@ -24,9 +23,6 @@ func (ctrl *SessionController) NewSession(c *gin.Context) {
 }
 
 func (ctrl *SessionController) CreateSession(c *gin.Context) {
-	// body, _ := ioutil.ReadAll(c.Request.Body)
-	// log.Println("Body: ", string(body))
-
 	var form forms.LoginForm
 	err := c.ShouldBind(&form)
 	if err != nil {
@@ -54,7 +50,6 @@ func (ctrl *SessionController) CreateSession(c *gin.Context) {
 func (ctrl *SessionController) DestroySession(c *gin.Context) {
 	session := ctrl.getNewSession(c)
 	session.SetUserId(3)
-	log.Println(session.ID())
 	session.Clear()
 
 	c.JSON(http.StatusOK, gin.H{"result": "success"})

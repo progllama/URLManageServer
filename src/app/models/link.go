@@ -2,18 +2,6 @@ package models
 
 import "github.com/jinzhu/gorm"
 
-type UrlBook struct {
-	gorm.Model
-	User User
-	Url  []Url
-}
-
-type UrlBookRelationship struct {
-	gorm.Model
-	Parent UrlBook
-	Child  UrlBook
-}
-
 type Url struct {
 	gorm.Model
 	OwnerId     int
