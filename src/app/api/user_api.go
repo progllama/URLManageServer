@@ -1,43 +1,63 @@
 package api
 
 import (
-	"net/http"
 	"url_manager/app/models"
-	"url_manager/app/repositories"
+	"url_manager/app/services"
 
 	"github.com/gin-gonic/gin"
 )
 
-type UserApi struct {
-	repo repositories.UserRepository
+// This responsibilities
+// 1. extract user data.
+// 2. call service with user data.
+// 3. set response with data returned by service.
+type UserApi interface {
+	Index()
+	Show()
+	Create()
+	Update()
+	Delete()
 }
 
-func NewUserApi(r repositories.UserRepository) *UserApi {
-	return &UserApi{r}
+type userApi struct {
+	service services.UserService
 }
 
-func (api *UserApi) Index(ctx *gin.Context) {
-	users, err := api.repo.All()
-	if err != nil {
-		ctx.JSON(http.StatusNotFound, []models.User{})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, users)
+func NewUserApi(s services.UserService) *userApi {
+	return &userApi{s}
 }
 
-func (api *UserApi) Show(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{})
+func (api *userApi) Index(ctx *gin.Context) {
+	response := api.service.FindUsers()
+	ctx.JSON(response.Code(), response.Body())
 }
 
-func (api *UserApi) Create(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{})
+func (api *userApi) Show(ctx *gin.Context) {
+	userId := ctx.Param("userId")
+
+	response := api.service.FindUser(userId)
+	ctx.JSON(response.Code(), response.Body())
 }
 
-func (api *UserApi) Update(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{})
+func (api *userApi) Create(ctx *gin.Context) {
+	var user models.User
+	err := ctx.ShouldBindJSON(&user)
+
+	response := api.service.Create(user)
+	ctx.JSON(response.Code(), response.Body())
 }
 
-func (api *UserApi) Delete(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{})
+func (api *userApi) Update(ctx *gin.Context) {
+	var user models.User
+	err := ctx.ShouldBindJSON(&user)
+
+	response := api.service.Create(user)
+	ctx.JSON(response.Code(), response.Body())
+}
+
+func (api *userApi) Delete(ctx *gin.Context) {
+	userId := ctx.Param("userId")
+
+	response := api.service.Delete(userId)
+	ctx.JSON(response.Code(), response.Body())
 }

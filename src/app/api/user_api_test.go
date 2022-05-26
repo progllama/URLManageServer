@@ -5,11 +5,18 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 	"url_manager/app/repositories"
+	"url_manager/app/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/assert/v2"
+)
+
+var (
+	service = new(services.UserService)
+	// repo    = new(repositories.UserRepository)
 )
 
 func TestUserApiIndexSuccess(t *testing.T) {
@@ -17,7 +24,9 @@ func TestUserApiIndexSuccess(t *testing.T) {
 	route := "/api/users"
 
 	repo := repositories.NewUserRepositoryMock()
-	api := NewUserApi(repo)
+	var mock repositories.UserRepository = repo
+
+	api := NewUserApi(mock, service)
 	router.GET(route, api.Index)
 
 	w := httptest.NewRecorder()
@@ -34,7 +43,9 @@ func TestUserApiIndexSuccessAny(t *testing.T) {
 
 	repo := repositories.NewUserRepositoryMock()
 	repo.Create("test-name", "login-id", "password")
-	api := NewUserApi(repo)
+	var mock repositories.UserRepository = repo
+
+	api := NewUserApi(mock, service)
 	router.GET(route, api.Index)
 
 	w := httptest.NewRecorder()
@@ -52,7 +63,10 @@ func TestUserApiIndexFail(t *testing.T) {
 
 	repo := repositories.NewUserRepositoryMock()
 	repo.Error = errors.New("Dummy error.")
-	api := NewUserApi(repo)
+
+	var mock repositories.UserRepository = repo
+	api := NewUserApi(mock, service)
+
 	router.GET(route, api.Index)
 
 	w := httptest.NewRecorder()
@@ -66,4 +80,145 @@ func TestUserApiIndexFail(t *testing.T) {
 func NewTestRouter() *gin.Engine {
 	gin.DefaultWriter = ioutil.Discard
 	return gin.New()
+}
+
+func TestNewUserApi(t *testing.T) {
+	type args struct {
+		r repositories.UserRepository
+		s services.UserService
+	}
+	tests := []struct {
+		name string
+		args args
+		want *userApi
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewUserApi(tt.args.r, tt.args.s); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewUserApi() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_userApi_Index(t *testing.T) {
+	type fields struct {
+		repo repositories.UserRepository
+	}
+	type args struct {
+		ctx *gin.Context
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			api := &userApi{
+				repo: tt.fields.repo,
+			}
+			api.Index(tt.args.ctx)
+		})
+	}
+}
+
+func Test_userApi_Show(t *testing.T) {
+	type fields struct {
+		repo repositories.UserRepository
+	}
+	type args struct {
+		ctx *gin.Context
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			api := &userApi{
+				repo: tt.fields.repo,
+			}
+			api.Show(tt.args.ctx)
+		})
+	}
+}
+
+func Test_userApi_Create(t *testing.T) {
+	type fields struct {
+		repo repositories.UserRepository
+	}
+	type args struct {
+		ctx *gin.Context
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			api := &userApi{
+				repo: tt.fields.repo,
+			}
+			api.Create(tt.args.ctx)
+		})
+	}
+}
+
+func Test_userApi_Update(t *testing.T) {
+	type fields struct {
+		repo repositories.UserRepository
+	}
+	type args struct {
+		ctx *gin.Context
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			api := &userApi{
+				repo: tt.fields.repo,
+			}
+			api.Update(tt.args.ctx)
+		})
+	}
+}
+
+func Test_userApi_Delete(t *testing.T) {
+	type fields struct {
+		repo repositories.UserRepository
+	}
+	type args struct {
+		ctx *gin.Context
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			api := &userApi{
+				repo: tt.fields.repo,
+			}
+			api.Delete(tt.args.ctx)
+		})
+	}
 }
