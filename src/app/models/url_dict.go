@@ -2,8 +2,8 @@ package models
 
 import "github.com/jinzhu/gorm"
 
-type Memo struct {
+type UrlDict struct {
 	gorm.Model
-	URLID   uint
-	Content string
+	Owner User `gorm:""`
+	Url   []Url
 }

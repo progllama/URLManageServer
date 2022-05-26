@@ -6,37 +6,38 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"url_manager/app"
 	"url_manager/app/forms"
-	"url_manager/app/models"
 	"url_manager/app/repositories"
+	"url_manager/app/session"
 	"url_manager/app/uris"
 
 	"github.com/gin-gonic/gin"
 )
 
 var (
-	ErrCantExtractUserId = errors.New("can't extract user id.")
+	ErrCantExtractUserId = errors.New("can't extract user id")
 )
 
 type UsersController struct {
-	repo *repositories.UserRepository
+	repo           repositories.UserRepository
+	sessionFactory session.SessionFactory
 }
 
-func NewUserController() *UsersController {
+func NewUserController(r repositories.UserRepository, sf session.SessionFactory) *UsersController {
 	return &UsersController{
-		repo: repositories.NewUserRepository(),
+		repo:           r,
+		sessionFactory: sf,
 	}
 }
 
 func (ctrl *UsersController) ShowAll(c *gin.Context) {
-	users, err := ctrl.repo.AllIdAndNames()
+	users, err := ctrl.repo.AllIdName()
 	if err != nil {
 		c.Error(err)
 		return
 	}
 
-	session := app.NewRedisSession(c)
+	session := session.NewRedisSession(c)
 	login := session.HasUserId()
 
 	c.HTML(
@@ -64,7 +65,7 @@ func (ctrl *UsersController) Show(ctx *gin.Context) {
 		return
 	}
 
-	session := app.NewRedisSession(ctx)
+	session := session.NewRedisSession(ctx)
 	login := session.HasUserId()
 
 	ctx.HTML(
@@ -79,7 +80,7 @@ func (ctrl *UsersController) Show(ctx *gin.Context) {
 }
 
 func (ctrl *UsersController) extractUserId(ctx *gin.Context) (int, error) {
-	session := app.NewRedisSession(ctx)
+	session := session.NewRedisSession(ctx)
 	if session.HasUserId() {
 		return session.GetUserId(), nil
 	}
@@ -94,7 +95,7 @@ func (ctrl *UsersController) extractUserId(ctx *gin.Context) (int, error) {
 }
 
 func (ctrl *UsersController) New(c *gin.Context) {
-	session := app.NewRedisSession(c)
+	session := session.NewRedisSession(c)
 
 	c.HTML(
 		http.StatusOK,
@@ -117,13 +118,14 @@ func (ctrl *UsersController) Create(c *gin.Context) {
 
 	log.Println("Success form binding.")
 
-	exist, err := ctrl.repo.Exists(models.User{Name: form.Name})
+	exist, err := ctrl.repo.HasUserName(form.Name)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	if exist {
 		log.Println("Name is not unique.")
+		c.Redirect(http.StatusFound, "/users/new")
 		return
 	}
 
@@ -141,7 +143,7 @@ func (ctrl *UsersController) Create(c *gin.Context) {
 }
 
 func (ctrl *UsersController) Edit(c *gin.Context) {
-	session := app.NewRedisSession(c)
+	session := session.NewRedisSession(c)
 	c.HTML(http.StatusOK, "edit_user.html", gin.H{"login": session.HasUserId()})
 }
 

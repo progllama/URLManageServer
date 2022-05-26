@@ -1,24 +1,42 @@
 package repositories
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"url_manager/app/models"
 	"url_manager/db"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
-type UserRepository struct {
+type UserRepository interface {
+	All() ([]models.User, error)
+	AllIdName() ([]SafeUser, error)
+	FindById(int) (models.User, error)
+	FindByName(string) (models.User, error)
+	FindByLoginId(string) (models.User, error)
+	Create(name, loginId, password string) error
+	Update(id int, name, login, password string) error
+	Delete(id int) error
+	// HasUserId(int) (bool, error)
+	HasUserName(string) (bool, error)
+	// HasUserLoginId(string) (bool, error)
 }
 
-func NewUserRepository() *UserRepository {
-	return &UserRepository{}
+type GormUserRepository struct {
+	db *gorm.DB
 }
 
-func (repo *UserRepository) All() ([]models.User, error) {
+func GormNewUserRepository() *GormUserRepository {
+	return &GormUserRepository{
+		db: db.GetDB(),
+	}
+}
+
+func (repo *GormUserRepository) All() ([]models.User, error) {
 	var users []models.User
-	dbResult := repo.getDB().Table("users").Select("*").Find(&users)
+	dbResult := repo.db.Table("users").Select("*").Find(&users)
 
 	if dbResult.Error == nil {
 		return users, nil
@@ -27,21 +45,26 @@ func (repo *UserRepository) All() ([]models.User, error) {
 	}
 }
 
-func (repo *UserRepository) Find(condition models.User) ([]models.User, error) {
-	var users []models.User
-	dbResult := repo.getDB().Where(&condition).Find(&users)
-
-	if dbResult.Error == nil {
-		return users, nil
-	} else {
-		return []models.User{}, dbResult.Error
-	}
+type SafeUser struct {
+	Name string
+	ID   string
 }
 
-func (repo *UserRepository) FindById(id int) (models.User, error) {
+func (repo *GormUserRepository) AllIdName() ([]SafeUser, error) {
+	var users []SafeUser
+	dbResult := repo.db.Table("users").Find(&users)
+
+	if dbResult.Error != nil {
+		return make([]SafeUser, 0), dbResult.Error
+	}
+
+	return users, nil
+}
+
+func (repo *GormUserRepository) FindById(id int) (models.User, error) {
 	fmt.Println(id)
 	var user models.User
-	dbResult := db.GetDB().Where("id=?", id).First(&user)
+	dbResult := repo.db.Where("id=?", id).First(&user)
 
 	log.Println(id)
 
@@ -52,9 +75,9 @@ func (repo *UserRepository) FindById(id int) (models.User, error) {
 	}
 }
 
-func (repo *UserRepository) FindByName(name string) (models.User, error) {
+func (repo *GormUserRepository) FindByName(name string) (models.User, error) {
 	var user models.User
-	dbResult := db.GetDB().Where("name=?", name).First(&user)
+	dbResult := repo.db.Where("name=?", name).First(&user)
 
 	if dbResult.Error == nil {
 		return user, nil
@@ -63,11 +86,9 @@ func (repo *UserRepository) FindByName(name string) (models.User, error) {
 	}
 }
 
-func (repo *UserRepository) FindByLoginId(loginId string) (models.User, error) {
+func (repo *GormUserRepository) FindByLoginId(loginId string) (models.User, error) {
 	var user models.User
-	dbResult := db.GetDB().Where("login_id=?", loginId).First(&user)
-
-	log.Println(db.GetDB().Model(&models.User{}))
+	dbResult := repo.db.Where("login_id=?", loginId).First(&user)
 
 	if dbResult.Error == nil {
 		return user, nil
@@ -76,23 +97,7 @@ func (repo *UserRepository) FindByLoginId(loginId string) (models.User, error) {
 	}
 }
 
-type SafeUser struct {
-	Name string
-	ID   string
-}
-
-func (repo *UserRepository) AllIdAndNames() ([]SafeUser, error) {
-	var users []SafeUser
-	dbResult := repo.getDB().Table("users").Find(&users)
-
-	if dbResult.Error != nil {
-		return make([]SafeUser, 0), dbResult.Error
-	}
-
-	return users, nil
-}
-
-func (repo *UserRepository) Create(name string, loginId string, password string) error {
+func (repo *GormUserRepository) Create(name string, loginId string, password string) error {
 	user := models.User{
 		Name:    name,
 		LoginId: loginId,
@@ -104,18 +109,18 @@ func (repo *UserRepository) Create(name string, loginId string, password string)
 	}
 	user.Password = hashPass
 
-	dbResult := repo.getDB().Create(&user)
+	dbResult := repo.db.Create(&user)
 	return dbResult.Error
 }
 
-func (repo *UserRepository) Update(id int, name string, loginId string, password string) error {
+func (repo *GormUserRepository) Update(id int, name string, loginId string, password string) error {
 	u := models.User{
 		ID:       id,
 		Name:     name,
 		LoginId:  loginId,
 		Password: password,
 	}
-	dbResult := repo.getDB().Updates(u)
+	dbResult := repo.db.Model(&models.User{}).Updates(u)
 
 	if dbResult != nil {
 		return dbResult.Error
@@ -124,17 +129,16 @@ func (repo *UserRepository) Update(id int, name string, loginId string, password
 	}
 }
 
-func (repo *UserRepository) Delete(id int) error {
+func (repo *GormUserRepository) Delete(id int) error {
 	var user models.User
-	dbResult := repo.getDB().Where("id=?", id).Delete(&user)
+	dbResult := repo.db.Where("id=?", id).Delete(&user)
 	return dbResult.Error
 }
 
-func (repo *UserRepository) Exists(condition models.User) (bool, error) {
+func (repo *GormUserRepository) HasUserName(name string) (bool, error) {
 	var users []models.User
-	log.Println(condition)
-	dbResult := repo.getDB().Where(&condition).Limit(1).First(&users)
-	if dbResult.Error != nil {
+	dbResult := repo.db.Select("id").Where("name=?", name).Limit(1).Take(&users)
+	if !errors.Is(dbResult.Error, gorm.ErrRecordNotFound) && dbResult.Error != nil {
 		return false, dbResult.Error
 	}
 
@@ -146,8 +150,4 @@ func (repo *UserRepository) Exists(condition models.User) (bool, error) {
 		log.Println(len(users))
 		return false, nil
 	}
-}
-
-func (repo *UserRepository) getDB() *gorm.DB {
-	return db.GetDB()
 }

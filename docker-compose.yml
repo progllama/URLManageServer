@@ -12,10 +12,10 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    command: ./main
+    command: go run main.go
     ports:
       - 8000:8000
-    working_dir: /app
+    working_dir: /go/src/app
     environment:
       DBMS: postgres
       HOST: postgres
