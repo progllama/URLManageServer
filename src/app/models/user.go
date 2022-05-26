@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -24,6 +25,7 @@ func (user *User) Authenticate(loginId string, password string) bool {
 // TODO パスワードのハッシュ化はこの構造体の責務"オブジェクトの永続化"でないので移動する。
 // 本当にそう？
 func (user *User) GenerateHashFromPassword(password string) (string, error) {
+	strings.Split("", " ")
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), 12) // 2 ^ 12 回　ストレッチ回数
 	return string(hash), err
 }

@@ -2,9 +2,8 @@ package models
 
 import "github.com/jinzhu/gorm"
 
-type VisitCount struct {
+type UrlDict struct {
 	gorm.Model
-	URLID  int
-	UserID int
-	Count  int
+	Owner User `gorm:""`
+	Url   []Url
 }

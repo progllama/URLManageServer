@@ -10,32 +10,9 @@ type Url struct {
 	Description string ``
 	Note        string ``
 	VisitCount  int
+	User        User `gorm:"foreignKey:OwnerId"`
 }
 
 func NewUrl() *Url {
 	return &Url{}
-}
-
-type Comment struct {
-	gorm.Model
-	Owner User
-	Url   Url
-	Text  string
-}
-
-type CommentRelationShip struct {
-	gorm.Model
-	Parent Comment
-	Child  Comment
-}
-
-type MasterTag struct {
-	gorm.Model
-	Name string
-}
-
-type TagMap struct {
-	gorm.Model
-	Url       Url
-	MasterTag MasterTag
 }
