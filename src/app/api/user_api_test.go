@@ -16,7 +16,6 @@ import (
 
 var (
 	service = new(services.UserService)
-	// repo    = new(repositories.UserRepository)
 )
 
 func TestUserApiIndexSuccess(t *testing.T) {
@@ -26,7 +25,7 @@ func TestUserApiIndexSuccess(t *testing.T) {
 	repo := repositories.NewUserRepositoryMock()
 	var mock repositories.UserRepository = repo
 
-	api := NewUserApi(mock, service)
+	api := NewUserApi(service)
 	router.GET(route, api.Index)
 
 	w := httptest.NewRecorder()

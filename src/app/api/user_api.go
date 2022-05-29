@@ -1,16 +1,17 @@
 package api
 
 import (
-	"url_manager/app/models"
 	"url_manager/app/services"
+	"url_manager/domain/models"
 
 	"github.com/gin-gonic/gin"
 )
 
-// This responsibilities
-// 1. extract user data.
-// 2. call service with user data.
-// 3. set response with data returned by service.
+// path parameter keys.
+const (
+	UserId = "userId"
+)
+
 type UserApi interface {
 	Index()
 	Show()
@@ -42,6 +43,10 @@ func (api *userApi) Show(ctx *gin.Context) {
 func (api *userApi) Create(ctx *gin.Context) {
 	var user models.User
 	err := ctx.ShouldBindJSON(&user)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
 
 	response := api.service.Create(user)
 	ctx.JSON(response.Code(), response.Body())
@@ -50,13 +55,17 @@ func (api *userApi) Create(ctx *gin.Context) {
 func (api *userApi) Update(ctx *gin.Context) {
 	var user models.User
 	err := ctx.ShouldBindJSON(&user)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
 
 	response := api.service.Create(user)
 	ctx.JSON(response.Code(), response.Body())
 }
 
 func (api *userApi) Delete(ctx *gin.Context) {
-	userId := ctx.Param("userId")
+	userId := ctx.Param(UserId)
 
 	response := api.service.Delete(userId)
 	ctx.JSON(response.Code(), response.Body())
