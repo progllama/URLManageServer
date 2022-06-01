@@ -7,66 +7,83 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// path parameter keys.
-const (
-	UserId = "userId"
-)
+type UserApiConfig struct {
+	UserIdPathParamKey string
+}
+
+func NewUserApiConfig() UserApiConfig {
+	return UserApiConfig{}
+}
 
 type UserApi interface {
-	Index()
-	Show()
-	Create()
-	Update()
-	Delete()
+	Index(*gin.Context)
+	Show(*gin.Context)
+	Create(*gin.Context)
+	Update(*gin.Context)
+	Delete(*gin.Context)
 }
 
 type userApi struct {
 	service services.UserService
+	config  UserApiConfig
 }
 
-func NewUserApi(s services.UserService) *userApi {
-	return &userApi{s}
+func NewUserApi(s services.UserService, c UserApiConfig) UserApi {
+	return &userApi{s, c}
 }
 
 func (api *userApi) Index(ctx *gin.Context) {
 	response := api.service.FindUsers()
-	ctx.JSON(response.Code(), response.Body())
+	api.assignResponse(ctx, response)
 }
 
 func (api *userApi) Show(ctx *gin.Context) {
-	userId := ctx.Param("userId")
-
+	userId := api.extractUserId(ctx)
 	response := api.service.FindUser(userId)
-	ctx.JSON(response.Code(), response.Body())
+	api.assignResponse(ctx, response)
 }
 
 func (api *userApi) Create(ctx *gin.Context) {
-	var user models.User
-	err := ctx.ShouldBindJSON(&user)
+	user, err := api.deserializeUser(ctx)
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
 	response := api.service.Create(user)
-	ctx.JSON(response.Code(), response.Body())
+	api.assignResponse(ctx, response)
 }
 
 func (api *userApi) Update(ctx *gin.Context) {
-	var user models.User
-	err := ctx.ShouldBindJSON(&user)
+	user, err := api.deserializeUser(ctx)
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
 	response := api.service.Create(user)
-	ctx.JSON(response.Code(), response.Body())
+	api.assignResponse(ctx, response)
 }
 
 func (api *userApi) Delete(ctx *gin.Context) {
-	userId := ctx.Param(UserId)
-
+	userId := api.extractUserId(ctx)
 	response := api.service.Delete(userId)
-	ctx.JSON(response.Code(), response.Body())
+	api.assignResponse(ctx, response)
+}
+
+func (api *userApi) deserializeUser(ctx *gin.Context) (models.User, error) {
+	var user models.User
+	err := ctx.ShouldBindJSON(&user)
+	if err != nil {
+		return models.User{}, err
+	}
+	return user, nil
+}
+
+func (api *userApi) extractUserId(ctx *gin.Context) string {
+	return ctx.Param(api.config.UserIdPathParamKey)
+}
+
+func (api *userApi) assignResponse(ctx *gin.Context, response services.UserServiceResponse) {
+	ctx.JSON(response.Code, response.Body)
 }

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -15,17 +14,15 @@ import (
 )
 
 var (
-	service = new(services.UserService)
+	service services.UserService
+	config  UserApiConfig
 )
 
 func TestUserApiIndexSuccess(t *testing.T) {
 	router := NewTestRouter()
 	route := "/api/users"
 
-	repo := repositories.NewUserRepositoryMock()
-	var mock repositories.UserRepository = repo
-
-	api := NewUserApi(service)
+	api := NewUserApi(service, config)
 	router.GET(route, api.Index)
 
 	w := httptest.NewRecorder()
@@ -40,11 +37,7 @@ func TestUserApiIndexSuccessAny(t *testing.T) {
 	router := NewTestRouter()
 	route := "/api/users"
 
-	repo := repositories.NewUserRepositoryMock()
-	repo.Create("test-name", "login-id", "password")
-	var mock repositories.UserRepository = repo
-
-	api := NewUserApi(mock, service)
+	api := NewUserApi(service, config)
 	router.GET(route, api.Index)
 
 	w := httptest.NewRecorder()
@@ -60,11 +53,7 @@ func TestUserApiIndexFail(t *testing.T) {
 	router := NewTestRouter()
 	route := "/api/users"
 
-	repo := repositories.NewUserRepositoryMock()
-	repo.Error = errors.New("Dummy error.")
-
-	var mock repositories.UserRepository = repo
-	api := NewUserApi(mock, service)
+	api := NewUserApi(service, config)
 
 	router.GET(route, api.Index)
 
@@ -83,8 +72,8 @@ func NewTestRouter() *gin.Engine {
 
 func TestNewUserApi(t *testing.T) {
 	type args struct {
-		r repositories.UserRepository
 		s services.UserService
+		c UserApiConfig
 	}
 	tests := []struct {
 		name string
@@ -95,7 +84,7 @@ func TestNewUserApi(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewUserApi(tt.args.r, tt.args.s); !reflect.DeepEqual(got, tt.want) {
+			if got := NewUserApi(tt.args.s, tt.args.c); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewUserApi() = %v, want %v", got, tt.want)
 			}
 		})
@@ -118,9 +107,7 @@ func Test_userApi_Index(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			api := &userApi{
-				repo: tt.fields.repo,
-			}
+			api := &userApi{}
 			api.Index(tt.args.ctx)
 		})
 	}
@@ -142,9 +129,7 @@ func Test_userApi_Show(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			api := &userApi{
-				repo: tt.fields.repo,
-			}
+			api := &userApi{}
 			api.Show(tt.args.ctx)
 		})
 	}
@@ -166,9 +151,7 @@ func Test_userApi_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			api := &userApi{
-				repo: tt.fields.repo,
-			}
+			api := &userApi{}
 			api.Create(tt.args.ctx)
 		})
 	}
@@ -190,9 +173,7 @@ func Test_userApi_Update(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			api := &userApi{
-				repo: tt.fields.repo,
-			}
+			api := &userApi{}
 			api.Update(tt.args.ctx)
 		})
 	}
@@ -214,9 +195,7 @@ func Test_userApi_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			api := &userApi{
-				repo: tt.fields.repo,
-			}
+			api := &userApi{}
 			api.Delete(tt.args.ctx)
 		})
 	}

@@ -3,8 +3,8 @@ package repositories
 import (
 	"fmt"
 	"log"
-	"url_manager/app/models"
 	"url_manager/db"
+	"url_manager/domain/models"
 )
 
 // type URLRepository interface {

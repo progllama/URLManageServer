@@ -1,7 +1,8 @@
 package db
 
 import (
-	"url_manager/app/models"
+	"fmt"
+	"url_manager/domain/models"
 
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
@@ -44,4 +45,29 @@ func Close() {
 func Migrate() {
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Url{})
+}
+
+func BuildDNS(params map[string]string) string {
+	isValid := validate(params)
+	if !isValid {
+		panic("DNS parameter is not valid.")
+	} else {
+		return build(params)
+	}
+}
+
+func validate(params map[string]string) bool {
+	return true
+}
+
+func build(params map[string]string) string {
+	dns := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+		params["host"],
+		params["port"],
+		params["user"],
+		params["dbname"],
+		params["password"],
+	)
+	fmt.Println(dns)
+	return dns
 }

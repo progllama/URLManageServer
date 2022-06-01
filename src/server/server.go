@@ -1,28 +1,34 @@
 package server
 
 import (
-	"url_manager/app/controllers"
+	"url_manager/app/api"
 	"url_manager/app/middlewares"
-	"url_manager/app/repositories"
-	"url_manager/app/session"
 
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
 )
 
 // dependency
-var (
-	sessionFactory = session.NewMemSessionFactory()
-)
+// var (
+// 	sessionFactory = session.NewMemSessionFactory()
+// )
 
 func Open(port string) {
 	router := gin.Default()
 
-	router.LoadHTMLGlob("app/templates/**/*")
-	router.Static("/css", "app/assets/css")
-	router.Static("/js", "app/assets/js")
 	router.Static("favicon.ico", "app/assets/favicon.ico")
+	router.Use(middlewares.ServeFavicon("./favicon.ico"))
+
+	{
+		errorHandler := middlewares.NewErrorHandler()
+		router4user := router.Group("/users")
+		router4user.Use(errorHandler.Handle)
+		api := api.NewUserApi(nil, api.UserApiConfig{})
+		router4user.GET("", api.Index)
+		router4user.GET("/:userId", api.Show)
+		router4user.POST("/:userId", api.Create)
+		router4user.PUT("/:userId", api.Update)
+		router4user.DELETE("/:userId", api.Delete)
+	}
 
 	// store, err := redis.NewStore(10, "tcp", "redis:6379", "", []byte("32bytes-secret-auth-key"))
 	// if err != nil {
@@ -30,10 +36,8 @@ func Open(port string) {
 	// }
 	// router.Use(sessions.Sessions("URLManager", store))
 
-	store := memstore.NewStore([]byte("secret"))
-	router.Use(sessions.Sessions("mysession", store))
-
-	router.Use(middlewares.ServeFavicon("./favicon.ico"))
+	// store := memstore.NewStore([]byte("secret"))
+	// router.Use(sessions.Sessions("mysession", store))
 
 	// router.Use(cors.New(cors.Config{
 	// 	// 許可したいHTTPメソッドの一覧
@@ -66,43 +70,6 @@ func Open(port string) {
 	// 	// https://godoc.org/github.com/gin-contrib/cors#Config の中のコメントに詳細あり
 	// 	MaxAge: 24 * time.Hour,
 	// }))
-
-	factory := session.NewMemSessionFactory()
-	lrm := middlewares.NewLoginRequireMiddleware(factory, middlewares.DoNothing, middlewares.RedirectToLoginPage)
-
-	{
-		ctrl := controllers.NewSessionController(repositories.GormNewUserRepository())
-		router.GET("/login", ctrl.NewSession)
-		router.POST("/login", ctrl.CreateSession)
-		router.DELETE("/logout", ctrl.DestroySession)
-	}
-
-	users := router.Group("/users")
-	{
-		ctrl := controllers.NewUserController(repositories.GormNewUserRepository(), sessionFactory)
-		users.GET("", ctrl.ShowAll)
-		users.GET("/:id", ctrl.Show)
-		users.GET("/new", ctrl.New)
-		users.POST("", ctrl.Create)
-		users.GET("/:id/edit", lrm.RequireLogin(), ctrl.Edit)
-		users.PUT("/:id", lrm.RequireLogin(), ctrl.Update)
-		users.PATCH("/:id", lrm.RequireLogin(), ctrl.Update)
-		users.DELETE("/:id", lrm.RequireLogin(), ctrl.Delete)
-
-		router.GET("/", lrm.RequireLogin(), ctrl.Show)
-
-		urls := users.Group("/:id/urls")
-		{
-			ctrl := controllers.NewUrlsController(repositories.GormNewUserRepository())
-			urls.GET("", ctrl.ShowURLs)
-			urls.GET("/:url_id", ctrl.ShowURL)
-			urls.GET("/new", lrm.RequireLogin(), ctrl.NewURL)
-			urls.POST("", lrm.RequireLogin(), ctrl.CreateURL)
-			urls.GET("/:url_id/edit", lrm.RequireLogin(), ctrl.EditURL)
-			urls.PUT("/:url_id", lrm.RequireLogin(), ctrl.UpdateURL)
-			urls.DELETE("/:url_id", lrm.RequireLogin(), ctrl.DeleteURL)
-		}
-	}
 
 	router.Run(port)
 }
