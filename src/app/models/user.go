@@ -11,9 +11,9 @@ type User struct {
 	ID        int `gorm:"primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Name      string `form:"name" json:"name" binding:"required" gorm:"unique;not null"`
-	LoginId   string `form:"login_id" json:"login_id" binding:""`
-	Password  string `form:"password" json:"password" binding:"required" gorm:"size:100"`
+	Name      string `json:"name" binding:"required" gorm:"unique;not null"`
+	LoginId   string `json:"login_id" binding:""`
+	Password  string `json:"password" binding:"required" gorm:"size:100"`
 	Urls      []Url  `gorm:"foreignKey:OwnerId"`
 }
 
