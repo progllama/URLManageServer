@@ -3,6 +3,7 @@ package server
 import (
 	"url_manager/app/api"
 	"url_manager/app/middlewares"
+	"url_manager/session"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +15,8 @@ import (
 
 func Open(port string) {
 	router := gin.Default()
+
+	session.InitializeSession(router)
 
 	router.Static("favicon.ico", "app/assets/favicon.ico")
 	router.Use(middlewares.ServeFavicon("./favicon.ico"))

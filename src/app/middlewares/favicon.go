@@ -47,7 +47,7 @@ func ServeFavicon(path string) gin.HandlerFunc {
 	}
 
 	reader := bytes.NewReader(file)
-	log.Println("Success to regist ServeFavicon middleware.")
+	log.Println("Success to register ServeFavicon middleware.")
 
 	// ハンドラを返す
 	return func(c *gin.Context) {

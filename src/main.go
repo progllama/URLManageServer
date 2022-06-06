@@ -2,22 +2,20 @@ package main
 
 import (
 	"log"
-	"url_manager/configs"
-	"url_manager/db"
 	"url_manager/server"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	log.SetFlags(log.Llongfile)
+	loadEnv()
+	server.Open(":8000")
+}
 
-	configs.LoadConfig()
-
-	// dbms := configs.DBConfig["dbms"]
-	// dsn := db.BuildDNS(configs.DBConfig)
-	// db.Open(dbms, dsn)
-	db.OpenSqlite()
-	db.Migrate()
-	defer db.Close()
-
-	server.Open(configs.ServerConfig["port"])
+func loadEnv() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 }

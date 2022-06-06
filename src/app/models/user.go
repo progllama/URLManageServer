@@ -2,19 +2,17 @@ package models
 
 import (
 	"strings"
-	"time"
 
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type User struct {
-	ID        int `gorm:"primaryKey"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Name      string `json:"name" binding:"required" gorm:"unique;not null"`
-	LoginId   string `json:"login_id" binding:""`
-	Password  string `json:"password" binding:"required" gorm:"size:100"`
-	Urls      []Url  `gorm:"foreignKey:OwnerId"`
+	gorm.Model
+	Name     string `json:"name" binding:"required" gorm:"unique;not null"`
+	LoginId  string `json:"login_id" binding:""`
+	Password string `json:"password" binding:"required" gorm:"size:100"`
+	Urls     []Url  `gorm:"foreignKey:OwnerId"`
 }
 
 func (user *User) Authenticate(loginId string, password string) bool {

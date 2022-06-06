@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"url_manager/domain/models"
+	"url_manager/app/models"
 
 	"gorm.io/gorm"
 )
@@ -15,38 +15,45 @@ type UserRepository interface {
 	Exists(int) (bool, error)
 }
 
-type UserRepositoryImplPostgres struct {
+type userRepositoryImplPostgres struct {
 	db *gorm.DB
 }
 
 func NewUserRepository(db *gorm.DB) UserRepository {
-	return &UserRepositoryImplPostgres{
+	return &userRepositoryImplPostgres{
 		db,
 	}
 }
 
-func (repo *UserRepositoryImplPostgres) All() ([]models.User, error) {
+func (repo *userRepositoryImplPostgres) All() ([]models.User, error) {
 	var users []models.User
-	repo.db.Select("?, ?").Find(&users)
-	return users
+	err := repo.db.Find(&users).Error
+	return users, err
 }
 
-func (repo *UserRepositoryImplPostgres) Find(id int) (models.User, error) {
-	panic("")
+func (repo *userRepositoryImplPostgres) Find(id int) (models.User, error) {
+	var user models.User
+	err := repo.db.Where("id=?", id).First(&user).Error
+	return user, err
 }
 
-func (repo *UserRepositoryImplPostgres) Add(user models.User) error {
-	panic("")
+func (repo *userRepositoryImplPostgres) Add(user models.User) error {
+	result := repo.db.Create(&user)
+	return result.Error
 }
 
-func (repo *UserRepositoryImplPostgres) Update(user models.User) error {
-	panic("")
+func (repo *userRepositoryImplPostgres) Update(user models.User) error {
+	result := repo.db.Save(&user)
+	return result.Error
 }
 
-func (repo *UserRepositoryImplPostgres) Remove(id int) error {
-	panic("")
+func (repo *userRepositoryImplPostgres) Remove(id int) error {
+	result := repo.db.Delete(models.User{}, id)
+	return result.Error
 }
 
-func (repo *UserRepositoryImplPostgres) Exists(id int) (bool, error) {
-	panic("")
+func (repo *userRepositoryImplPostgres) Exists(id int) (bool, error) {
+	var user models.User
+	result := repo.db.Where("id=?", id).Limit(1).Find(user)
+	return result.RowsAffected > 0, result.Error
 }

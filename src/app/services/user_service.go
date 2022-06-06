@@ -1,6 +1,6 @@
 package services
 
-import "url_manager/domain/models"
+import "url_manager/app/models"
 
 // アプリケーションレイヤのサービス
 // ドメインの知識を入れてはいけない。
