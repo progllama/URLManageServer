@@ -7,7 +7,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 
 # This program built for i386-apple-darwin11.3.0
 
-# Make data base, printed on Thu May 26 02:02:55 2022
+# Make data base, printed on Wed Jun  8 00:39:38 2022
 
 # Variables
 
@@ -17,12 +17,8 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 ?F = $(notdir $?)
 # environment
 VSCODE_LOG_NATIVE = false
-# environment
-NVM_INC = /Users/yuta/.nvm/versions/node/v16.14.0/include/node
 # automatic
 ?D = $(patsubst %/,%,$(dir $?))
-# environment
-CPPFLAGS = -I/usr/local/opt/tcl-tk/include
 # automatic
 @D = $(patsubst %/,%,$(dir $@))
 # automatic
@@ -44,31 +40,25 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/pl/mmd6x5v158v2m1nr7v74l_vh0000gn/T/vscode-ipc-9c7ed9eb-3448-46c5-8164-ddcaa07f9734.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/pl/mmd6x5v158v2m1nr7v74l_vh0000gn/T/vscode-ipc-71774799-26e1-4446-aa5d-5649e4d19eaa.sock
 # environment
 VSCODE_CWD = /
 # environment
 GOPROXY = https://proxy.golang.org,direct
 # environment
-PATH = /Users/yuta/go/bin:/Users/yuta/.nvm/versions/node/v16.14.0/bin:/Users/yuta/bin:/usr/local/opt/tcl-tk/bin:/usr/local/opt/openssl@1.1/bin:/Users/yuta/.cargo/bin:/Users/yuta/.rbenv/bin:/Users/yuta/.pyenv/shims:/Users/yuta/.pyenv/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Library/Frameworks/Mono.framework/Versions/Current/Commands
-# environment
-PYTHON_CONFIGURE_OPTS = --with-tcltk-includes='-I/usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6'
+PATH = /usr/local/go/bin:/usr/bin:/bin:/usr/sbin:/sbin
 # environment
 GOPATH = /Users/yuta/go
 # environment
-NVM_BIN = /Users/yuta/.nvm/versions/node/v16.14.0/bin
+LaunchInstanceID = 8EB94D10-F27D-4950-9C47-3B270082547C
 # environment
 VSCODE_LOG_STACK = false
 # environment
 ELECTRON_RUN_AS_NODE = 1
-# environment
-PYENV_ROOT = /Users/yuta/.pyenv
-# environment
-LDFLAGS = -L/usr/local/opt/tcl-tk/lib
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.GaWcjhoTMD/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.LbhaZZL7sq/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -76,13 +66,9 @@ VSCODE_PIPE_LOGGING = true
 # environment
 PWD = /Users/yuta/Desktop/home/my-apps/web/url-plumber/back
 # environment
-PKG_CONFIG_PATH = /usr/local/opt/tcl-tk/lib/pkgconfig
-# environment
 ORIGINAL_XDG_CURRENT_DESKTOP = undefined
 # environment
 GOMODCACHE = /Users/yuta/go/pkg/mod
-# environment
-PYENV_SHELL = zsh
 # environment
 HOME = /Users/yuta
 # default
@@ -93,8 +79,6 @@ VSCODE_CODE_CACHE_PATH = /Users/yuta/Library/Application Support/Code/CachedData
 LOGNAME = yuta
 # environment
 APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
-# environment
-NVM_CD_FLAGS = -q
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # automatic
@@ -132,8 +116,6 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-NVM_DIR = /Users/yuta/.nvm
-# environment
 XPC_SERVICE_NAME = application.com.microsoft.VSCode.47586770.47586776
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
@@ -149,6 +131,8 @@ MAKEFILES :=
 <F = $(notdir $<)
 # environment
 LC_ALL = C
+# environment
+SECURITYSESSIONID = 186a3
 # automatic
 ^F = $(notdir $^)
 # default
@@ -160,9 +144,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 27586
+VSCODE_PID = 402
 # variable set hash-table stats:
-# Load=75/1024=7%, Rehash=0, Collisions=2/99=2%
+# Load=67/1024=7%, Rehash=0, Collisions=2/91=2%
 
 # Pattern-specific Variable Values
 
@@ -170,9 +154,9 @@ VSCODE_PID = 27586
 
 # Directories
 
-# . (device 16777220, inode 42558091): 11 files, no impossibilities.
+# . (device 16777220, inode 42558091): 14 files, no impossibilities.
 
-# 11 files, no impossibilities in 1 directories.
+# 14 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -198,7 +182,7 @@ all:
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
 
-.PHONY: up down prunei prunec rmi rmc prunev test
+.PHONY: up down prunei prunec rmi rmc prunev test build
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -221,7 +205,7 @@ up:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-11 00:16:30
+#  Last modified 2022-05-26 23:58:38
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -243,6 +227,15 @@ test:
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 32):
 	@docker-compose -f docker/dev/docker-compose.yml up -d
+	
+
+build:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 36):
+	go build src/cmd/runapp/main.go user_api.go user_api_test.go session_controller_test.go sessions_controller.go urls_controller.go urls_controller_test.go user_controller_test.go users_controller.go login_form.go url_form.go user_form.go favicon.go login_require_middleware.go login_require_middleware_test.go link.go url_dict.go user.go url_dict_repository.go url_repository.go user_repository.go user_repository_mock.go mem_session.go redis_sessoin.go session.go user.go main.go config.go db_config.go redis_config.go server_config.go db.go dsn.go server.go
 	
 
 # Not a target:
@@ -288,13 +281,13 @@ down:
 	
 
 # files hash-table stats:
- 
-make: *** No rule to make target `all'.  Stop.
-
-# Load=13/1024=1%, Rehash=0, Collisions=0/40=0%
+# Load=14/1024=1%, Rehash=0, Collisions=0/43=0%
 # VPATH Search Paths
 
 # No `vpath' search paths.
+
+ 
+make: *** No rule to make target `all'.  Stop.
 
 # No general (`VPATH' variable) search path.
 
@@ -303,6 +296,6 @@ make: *** No rule to make target `all'.  Stop.
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Thu May 26 02:02:55 2022
+# Finished Make data base on Wed Jun  8 00:39:38 2022
 
  

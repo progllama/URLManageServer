@@ -1,8 +1,8 @@
 package api
 
 import (
-	"url_manager/app/models"
-	"url_manager/app/services"
+	"url_manager/domain/models"
+	"url_manager/domain/services"
 
 	"github.com/gin-gonic/gin"
 )

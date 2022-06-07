@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
-	"url_manager/app/repositories"
-	"url_manager/app/services"
+	"url_manager/domain/repositories"
+	"url_manager/domain/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/assert/v2"
