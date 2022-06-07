@@ -1,10 +1,8 @@
 package api
 
 import (
-	"net/http"
 	"url_manager/interface/web/gin/services"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,17 +25,6 @@ func (api *authApi) Login(ctx *gin.Context) {
 }
 
 func (api *authApi) Logout(ctx *gin.Context) {
-	session := sessions.Default(ctx)
-	session.Clear()
-	err := session.Save()
-	if err != nil {
-		ctx.Error(err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{"logout": "success"})
-}
-
-func extractCredential(ctx *gin.Context) {
-
+	response := api.service.Logout(ctx)
+	ctx.JSON(response.Code, response.Body)
 }
