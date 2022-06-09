@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"url_manager/app/models"
+	"url_manager/models"
 
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"

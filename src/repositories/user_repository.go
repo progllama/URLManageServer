@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"url_manager/app/models"
+	"url_manager/domain/models"
 
 	"gorm.io/gorm"
 )
@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	All() ([]models.User, error)
 	Find(int) (models.User, error)
+	FindByEmail(string) (models.User, error)
 	Add(models.User) error
 	Update(models.User) error
 	Remove(int) error
@@ -34,6 +35,12 @@ func (repo *userRepositoryImplPostgres) All() ([]models.User, error) {
 func (repo *userRepositoryImplPostgres) Find(id int) (models.User, error) {
 	var user models.User
 	err := repo.db.Where("id=?", id).First(&user).Error
+	return user, err
+}
+
+func (repo *userRepositoryImplPostgres) FindByEmail(email string) (models.User, error) {
+	var user models.User
+	err := repo.db.Where("email=?", email).First(&user).Error
 	return user, err
 }
 
