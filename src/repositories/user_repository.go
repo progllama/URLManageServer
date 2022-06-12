@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"url_manager/domain/models"
+	"url_manager/models"
 
 	"gorm.io/gorm"
 )

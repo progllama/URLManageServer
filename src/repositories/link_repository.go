@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"url_manager/domain/models"
+	"url_manager/models"
 
 	"gorm.io/gorm"
 )
@@ -9,6 +9,7 @@ import (
 type LinkRepository interface {
 	All() ([]models.Link, error)
 	Find(int) (models.Link, error)
+	FindByListId(int) ([]models.Link, error)
 	Add(models.Link) error
 	Update(models.Link) error
 	Remove(int) error
@@ -35,6 +36,12 @@ func (repo *linkRepository) Find(id int) (models.Link, error) {
 	var url models.Link
 	err := repo.db.Where("id=?", id).First(&url).Error
 	return url, err
+}
+
+func (repo *linkRepository) FindByListId(id int) ([]models.Link, error) {
+	var links []models.Link
+	err := repo.db.Where("link_list_id=?", id).Find(&links).Error
+	return links, err
 }
 
 func (repo *linkRepository) Add(url models.Link) error {

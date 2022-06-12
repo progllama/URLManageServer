@@ -1,7 +1,7 @@
 // Package google provides you access to Google's OAuth2
 // infrastructure. The implementation is based on this blog post:
 // http://skarlso.github.io/2016/06/12/google-signin-with-go/
-package google
+package middleware
 
 import (
 	"context"
@@ -13,8 +13,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"url_manager/domain/models"
-	"url_manager/domain/repositories"
+	"url_manager/models"
+	"url_manager/repositories"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"

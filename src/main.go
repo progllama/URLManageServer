@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"url_manager/interface/web/gin/server"
+	"url_manager/server"
 
 	"github.com/joho/godotenv"
 )

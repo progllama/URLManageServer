@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"url_manager/domain/models"
+	"url_manager/models"
 
 	"gorm.io/gorm"
 )
@@ -9,6 +9,8 @@ import (
 type LinkListRelationRepository interface {
 	All() ([]models.LinkListRelation, error)
 	Find(int) (models.LinkListRelation, error)
+	FindByUserId(int) ([]models.LinkListRelation, error)
+	FindByParentId(int) ([]models.LinkListRelation, error)
 	Add(models.LinkListRelation) error
 	Update(models.LinkListRelation) error
 	Remove(int) error
@@ -35,6 +37,18 @@ func (repo *linkListRelationRepository) Find(id int) (models.LinkListRelation, e
 	var relation models.LinkListRelation
 	err := repo.db.Where("id=?", id).First(&relation).Error
 	return relation, err
+}
+
+func (repo *linkListRelationRepository) FindByUserId(id int) ([]models.LinkListRelation, error) {
+	var relations []models.LinkListRelation
+	err := repo.db.Where("user_id=?", id).Find(&relations).Error
+	return relations, err
+}
+
+func (repo *linkListRelationRepository) FindByParentId(id int) ([]models.LinkListRelation, error) {
+	var relations []models.LinkListRelation
+	err := repo.db.Where("parent_id=?", id).Find(&relations).Error
+	return relations, err
 }
 
 func (repo *linkListRelationRepository) Add(relation models.LinkListRelation) error {

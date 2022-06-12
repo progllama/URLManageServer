@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"fmt"
@@ -6,7 +6,6 @@ import (
 
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -15,12 +14,8 @@ var (
 	err error
 )
 
-func GetDB() *gorm.DB {
+func Database() *gorm.DB {
 	return db
-}
-
-func OpenSqlite() {
-	db, err = gorm.Open(sqlite.Open("test.db"))
 }
 
 func Open(database string, dsn string) {
@@ -44,30 +39,17 @@ func Close() {
 
 func Migrate() {
 	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Url{})
+	db.AutoMigrate(&models.Link{})
+	db.AutoMigrate(&models.LinkList{})
+	db.AutoMigrate(&models.LinkListRelation{})
 }
 
-func BuildDNS(params map[string]string) string {
-	isValid := validate(params)
-	if !isValid {
-		panic("DNS parameter is not valid.")
-	} else {
-		return build(params)
-	}
-}
-
-func validate(params map[string]string) bool {
-	return true
-}
-
-func build(params map[string]string) string {
-	dns := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
-		params["host"],
-		params["port"],
-		params["user"],
-		params["dbname"],
-		params["password"],
+func BuildDNS(host, port, user, dbname, password string) string {
+	return fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+		host,
+		port,
+		user,
+		password,
+		password,
 	)
-	fmt.Println(dns)
-	return dns
 }
