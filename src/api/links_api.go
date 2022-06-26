@@ -38,7 +38,7 @@ func NewLinksApi(
 func (api *linksApi) Index(ctx *gin.Context) {
 	userInfo := getUserInfo(ctx)
 
-	user, err := api.userRepository.FindByEmail(userInfo.Email)
+	user, err := api.userRepository.FindByOpenID(userInfo.Id)
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -100,7 +100,7 @@ func (api *linksApi) Index(ctx *gin.Context) {
 func (api *linksApi) Show(ctx *gin.Context) {
 	userInfo := getUserInfo(ctx)
 
-	user, err := api.userRepository.FindByEmail(userInfo.Email)
+	user, err := api.userRepository.FindByOpenID(userInfo.Id)
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -150,7 +150,7 @@ func (api *linksApi) Show(ctx *gin.Context) {
 func (api *linksApi) Create(ctx *gin.Context) {
 	userInfo := getUserInfo(ctx)
 
-	user, err := api.userRepository.FindByEmail(userInfo.Email)
+	user, err := api.userRepository.FindByOpenID(userInfo.Id)
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -191,7 +191,7 @@ func (api *linksApi) Create(ctx *gin.Context) {
 func (api *linksApi) Update(ctx *gin.Context) {
 	userInfo := getUserInfo(ctx)
 
-	user, err := api.userRepository.FindByEmail(userInfo.Email)
+	user, err := api.userRepository.FindByOpenID(userInfo.Id)
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -232,7 +232,7 @@ func (api *linksApi) Update(ctx *gin.Context) {
 func (api *linksApi) Delete(ctx *gin.Context) {
 	userInfo := getUserInfo(ctx)
 
-	user, err := api.userRepository.FindByEmail(userInfo.Email)
+	user, err := api.userRepository.FindByOpenID(userInfo.Id)
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return

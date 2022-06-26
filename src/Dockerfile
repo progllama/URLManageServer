@@ -1,3 +1,4 @@
+# ビルド用のDockerファイルです。
 FROM golang:alpine
 COPY ./src /go/src/app
 WORKDIR /go/src/app

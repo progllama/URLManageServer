@@ -133,9 +133,9 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		_, err = repository.FindByEmail(userInfo.Email)
+		_, err = repository.FindByOpenID(userInfo.Id)
 		if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-			repository.Add(models.User{Email: userInfo.Email})
+			repository.Add(models.User{OpenID: userInfo.Id})
 		}
 
 		if err != nil {
