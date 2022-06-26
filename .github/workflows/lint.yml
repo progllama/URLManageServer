@@ -15,7 +15,6 @@ jobs:
         shell: bash
         working-directory: src
 
-
     steps:
       - uses: actions/checkout@v2
       - name: golangci-lint
