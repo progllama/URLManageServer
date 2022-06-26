@@ -6,8 +6,11 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
+ 
+make: *** No rule to make target `all'.  Stop.
 
-# Make data base, printed on Thu May 26 02:02:55 2022
+
+# Make data base, printed on Thu Jun 23 20:11:21 2022
 
 # Variables
 
@@ -28,11 +31,11 @@ CPPFLAGS = -I/usr/local/opt/tcl-tk/include
 # automatic
 @F = $(notdir $@)
 # makefile
-CURDIR := /Users/yuta/Desktop/home/my-apps/web/url-plumber/back
+CURDIR := /Users/yuta/Desktop/home/my-apps/web/url-plumber/backend
 # makefile
 SHELL = /bin/sh
 # environment
-VSCODE_NLS_CONFIG = {"locale":"ja","availableLanguages":{"*":"ja"},"_languagePackId":"f5b8523d60216379ef9ba6dc243eb093.ja","_translationsConfigFile":"/Users/yuta/Library/Application Support/Code/clp/f5b8523d60216379ef9ba6dc243eb093.ja/tcf.json","_cacheRoot":"/Users/yuta/Library/Application Support/Code/clp/f5b8523d60216379ef9ba6dc243eb093.ja","_resolvedLanguagePackCoreLocation":"/Users/yuta/Library/Application Support/Code/clp/f5b8523d60216379ef9ba6dc243eb093.ja/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5","_corruptedFile":"/Users/yuta/Library/Application Support/Code/clp/f5b8523d60216379ef9ba6dc243eb093.ja/corrupted.info","_languagePackSupport":true}
+VSCODE_NLS_CONFIG = {"locale":"ja","availableLanguages":{"*":"ja"},"_languagePackId":"f5b8523d60216379ef9ba6dc243eb093.ja","_translationsConfigFile":"/Users/yuta/Library/Application Support/Code/clp/f5b8523d60216379ef9ba6dc243eb093.ja/tcf.json","_cacheRoot":"/Users/yuta/Library/Application Support/Code/clp/f5b8523d60216379ef9ba6dc243eb093.ja","_resolvedLanguagePackCoreLocation":"/Users/yuta/Library/Application Support/Code/clp/f5b8523d60216379ef9ba6dc243eb093.ja/30d9c6cd9483b2cc586687151bcbcd635f373630","_corruptedFile":"/Users/yuta/Library/Application Support/Code/clp/f5b8523d60216379ef9ba6dc243eb093.ja/corrupted.info","_languagePackSupport":true}
 # environment
 _ = /usr/bin/make
 # makefile (from `Makefile', line 1)
@@ -44,7 +47,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/pl/mmd6x5v158v2m1nr7v74l_vh0000gn/T/vscode-ipc-9c7ed9eb-3448-46c5-8164-ddcaa07f9734.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/pl/mmd6x5v158v2m1nr7v74l_vh0000gn/T/vscode-ipc-c60b8733-f5c3-4b90-b4fd-bf97f5622933.sock
 # environment
 VSCODE_CWD = /
 # environment
@@ -68,13 +71,13 @@ LDFLAGS = -L/usr/local/opt/tcl-tk/lib
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.GaWcjhoTMD/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.6GY5MrDTRP/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
 VSCODE_PIPE_LOGGING = true
 # environment
-PWD = /Users/yuta/Desktop/home/my-apps/web/url-plumber/back
+PWD = /Users/yuta/Desktop/home/my-apps/web/url-plumber/backend
 # environment
 PKG_CONFIG_PATH = /usr/local/opt/tcl-tk/lib/pkgconfig
 # environment
@@ -88,7 +91,7 @@ HOME = /Users/yuta
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/yuta/Library/Application Support/Code/CachedData/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
+VSCODE_CODE_CACHE_PATH = /Users/yuta/Library/Application Support/Code/CachedData/30d9c6cd9483b2cc586687151bcbcd635f373630
 # environment
 LOGNAME = yuta
 # environment
@@ -124,7 +127,7 @@ TMPDIR = /var/folders/pl/mmd6x5v158v2m1nr7v74l_vh0000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/yuta/Library/Application Support/Code/1.67.2-main.sock
+VSCODE_IPC_HOOK = /Users/yuta/Library/Application Support/Code/1.68.1-main.sock
 # makefile
 MAKEFLAGS = Rrqp
 # environment
@@ -134,7 +137,7 @@ MFLAGS = -Rrqp
 # environment
 NVM_DIR = /Users/yuta/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.47586770.47586776
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.50790674.50790680
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
@@ -160,7 +163,7 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 27586
+VSCODE_PID = 41483
 # variable set hash-table stats:
 # Load=75/1024=7%, Rehash=0, Collisions=2/99=2%
 
@@ -170,9 +173,9 @@ VSCODE_PID = 27586
 
 # Directories
 
-# . (device 16777220, inode 42558091): 11 files, no impossibilities.
+# . (device 16777220, inode 42558091): 13 files, no impossibilities.
 
-# 11 files, no impossibilities in 1 directories.
+# 13 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -198,7 +201,7 @@ all:
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
 
-.PHONY: up down prunei prunec rmi rmc prunev test
+.PHONY: up down prunei prunec rmi rmc prunev test build
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -221,7 +224,7 @@ up:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-11 00:16:30
+#  Last modified 2022-05-26 23:58:38
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -243,6 +246,15 @@ test:
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 32):
 	@docker-compose -f docker/dev/docker-compose.yml up -d
+	
+
+build:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 36):
+	go build src/cmd/runapp/main.go user_api.go user_api_test.go session_controller_test.go sessions_controller.go urls_controller.go urls_controller_test.go user_controller_test.go users_controller.go login_form.go url_form.go user_form.go favicon.go login_require_middleware.go login_require_middleware_test.go link.go url_dict.go user.go url_dict_repository.go url_repository.go user_repository.go user_repository_mock.go mem_session.go redis_sessoin.go session.go user.go main.go config.go db_config.go redis_config.go server_config.go db.go dsn.go server.go
 	
 
 # Not a target:
@@ -270,6 +282,7 @@ prunev:
 	
 
 rmc:
+ 
 #  Phony target (prerequisite of .PHONY).
 #  Implicit rule search has not been done.
 #  File does not exist.
@@ -288,10 +301,7 @@ down:
 	
 
 # files hash-table stats:
- 
-make: *** No rule to make target `all'.  Stop.
-
-# Load=13/1024=1%, Rehash=0, Collisions=0/40=0%
+# Load=14/1024=1%, Rehash=0, Collisions=0/43=0%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -303,6 +313,6 @@ make: *** No rule to make target `all'.  Stop.
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Thu May 26 02:02:55 2022
+# Finished Make data base on Thu Jun 23 20:11:21 2022
 
  
