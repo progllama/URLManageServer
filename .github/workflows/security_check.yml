@@ -1,7 +1,5 @@
 name: security_check
 on:
-  push:
-  pull_request:
 jobs:
   vulns:
     name: Vulnerability scanner
