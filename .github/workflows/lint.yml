@@ -10,6 +10,12 @@ jobs:
         os: [ubuntu-latest]
     name: lint
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: scripts
+
+
     steps:
       - uses: actions/checkout@v2
       - name: golangci-lint
