@@ -10,14 +10,14 @@ jobs:
         working-directory: src
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-go@v3
-    with:
-      go-version: '^1.17.1'
-    - run: go build -o main
-    - name: Deploy to Server
-      uses: easingthemes/ssh-deploy@main
-      env:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: "^1.17.1"
+      - run: go build -o main
+      - name: Deploy to Server
+        uses: easingthemes/ssh-deploy@main
+        env:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
           SOURCE: "main"
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
