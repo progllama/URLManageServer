@@ -16,12 +16,11 @@ jobs:
           go-version: "^1.17.1"
       - run: go build -o main
       - name: Deploy to Server
-        uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SOURCE: "src/main"
-          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: ${{ secrets.REMOTE_TARGET }}
-          EXCLUDE: "*"
+        uses: horochx/deploy-via-scp@master
+        with:
+          local: src/main # eg: dist/*
+          remote: ${{ secrets.TARGET }} # eg: /home/github-action/www
+          host: ${{ secrets.REMOTE_HOST }} # eg: example.com
+          port: ${{ secrets.REMOTE_PORT }} # eg: 22
+          user: ${{ secrets.REMOTE_USER }} # eg: github-action
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # eg: -----BEGIN OPENSSH PRIVATE KEY-----\nHEIiyzh5cT7hN...
