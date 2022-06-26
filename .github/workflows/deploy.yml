@@ -1,23 +1,26 @@
-name: deploy
+name: Deploy
 
 on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src
 
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-go@v3
     with:
       go-version: '^1.17.1'
-    - run: go build main.go ./...
+    - run: go build -o main
     - name: Deploy to Server
       uses: easingthemes/ssh-deploy@main
       env:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          SOURCE: "dist/"
+          SOURCE: "main"
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           TARGET: ${{ secrets.REMOTE_TARGET }}
-          EXCLUDE: "/dist/, /node_modules/"
+          # EXCLUDE: "/dist/, /node_modules/"

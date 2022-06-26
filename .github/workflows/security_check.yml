@@ -1,4 +1,4 @@
-name: security_check
+name: Security Check
 on:
 jobs:
   vulns:
