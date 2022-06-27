@@ -6,11 +6,8 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
- 
-make: *** No rule to make target `all'.  Stop.
 
-
-# Make data base, printed on Thu Jun 23 20:11:21 2022
+# Make data base, printed on Mon Jun 27 21:03:16 2022
 
 # Variables
 
@@ -47,7 +44,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/pl/mmd6x5v158v2m1nr7v74l_vh0000gn/T/vscode-ipc-c60b8733-f5c3-4b90-b4fd-bf97f5622933.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/pl/mmd6x5v158v2m1nr7v74l_vh0000gn/T/vscode-ipc-5ce4e735-5639-4040-8753-a435273412a6.sock
 # environment
 VSCODE_CWD = /
 # environment
@@ -115,7 +112,7 @@ MAKE_VERSION := 3.81
 # environment
 USER = yuta
 # makefile
-.DEFAULT_GOAL := up
+.DEFAULT_GOAL := init
 # automatic
 %D = $(patsubst %/,%,$(dir $%))
 # default
@@ -173,24 +170,15 @@ VSCODE_PID = 41483
 
 # Directories
 
-# . (device 16777220, inode 42558091): 13 files, no impossibilities.
+# . (device 16777220, inode 42558091): 11 files, no impossibilities.
 
-# 13 files, no impossibilities in 1 directories.
+# 11 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
 # No implicit rules.
 
 # Files
-
-prunei:
-#  Phony target (prerequisite of .PHONY).
-#  Implicit rule search has not been done.
-#  File does not exist.
-#  File has not been updated.
-#  commands to execute (from `Makefile', line 12):
-	@docker image prune
-	
 
 # Not a target:
 all:
@@ -201,19 +189,10 @@ all:
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
 
-.PHONY: up down prunei prunec rmi rmc prunev test build
+.PHONY: init test build
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-
-up:
-#  Phony target (prerequisite of .PHONY).
-#  Implicit rule search has not been done.
-#  File does not exist.
-#  File has not been updated.
-#  commands to execute (from `Makefile', line 4):
-	@docker-compose up -d
-	
 
 # Not a target:
 .SUFFIXES:
@@ -224,28 +203,19 @@ up:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-26 23:58:38
+#  Last modified 2022-06-27 03:06:35
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
-
-prunec:
-#  Phony target (prerequisite of .PHONY).
-#  Implicit rule search has not been done.
-#  File does not exist.
-#  File has not been updated.
-#  commands to execute (from `Makefile', line 16):
-	@docker container prune
-	
 
 test:
 #  Phony target (prerequisite of .PHONY).
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 32):
-	@docker-compose -f docker/dev/docker-compose.yml up -d
+#  commands to execute (from `Makefile', line 7):
+	docker run goenv test
 	
 
 build:
@@ -253,8 +223,8 @@ build:
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 36):
-	go build src/cmd/runapp/main.go user_api.go user_api_test.go session_controller_test.go sessions_controller.go urls_controller.go urls_controller_test.go user_controller_test.go users_controller.go login_form.go url_form.go user_form.go favicon.go login_require_middleware.go login_require_middleware_test.go link.go url_dict.go user.go url_dict_repository.go url_repository.go user_repository.go user_repository_mock.go mem_session.go redis_sessoin.go session.go user.go main.go config.go db_config.go redis_config.go server_config.go db.go dsn.go server.go
+#  commands to execute (from `Makefile', line 11):
+	docker run goenv build .
 	
 
 # Not a target:
@@ -263,45 +233,17 @@ build:
 #  Modification time never checked.
 #  File has not been updated.
 
-rmi:
+init:
 #  Phony target (prerequisite of .PHONY).
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 20):
-	@docker rmi `docker images -q`
-	
-
-prunev:
-#  Phony target (prerequisite of .PHONY).
-#  Implicit rule search has not been done.
-#  File does not exist.
-#  File has not been updated.
-#  commands to execute (from `Makefile', line 28):
-	docker volume prune
-	
-
-rmc:
- 
-#  Phony target (prerequisite of .PHONY).
-#  Implicit rule search has not been done.
-#  File does not exist.
-#  File has not been updated.
-#  commands to execute (from `Makefile', line 24):
-	@docker rm -f `docker ps -a -q`
-	
-
-down:
-#  Phony target (prerequisite of .PHONY).
-#  Implicit rule search has not been done.
-#  File does not exist.
-#  File has not been updated.
-#  commands to execute (from `Makefile', line 8):
-	@docker-compose down
+#  commands to execute (from `Makefile', line 3):
+	docker build -t goenv .
 	
 
 # files hash-table stats:
-# Load=14/1024=1%, Rehash=0, Collisions=0/43=0%
+# Load=8/1024=1%, Rehash=0, Collisions=0/25=0%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -313,6 +255,8 @@ down:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Thu Jun 23 20:11:21 2022
+# Finished Make data base on Mon Jun 27 21:03:16 2022
 
  
+make: *** No rule to make target `all'.  Stop.
+
