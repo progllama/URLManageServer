@@ -8,14 +8,18 @@ import (
 )
 
 func main() {
-	log.SetFlags(log.Llongfile)
-	loadEnv()
-	server.Open(":8000")
+	setLogLevel()
+	loadEnvironment()
+	server.Open("PORT")
 }
 
-func loadEnv() {
+func loadEnvironment() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+}
+
+func setLogLevel() {
+	log.SetFlags(log.Llongfile)
 }

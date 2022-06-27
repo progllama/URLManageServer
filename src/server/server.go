@@ -3,7 +3,7 @@ package server
 import (
 	"os"
 	"url_manager/database"
-	middleware "url_manager/middlewares"
+	"url_manager/middleware"
 	"url_manager/repositories"
 	"url_manager/session"
 
@@ -15,18 +15,22 @@ import (
 func Open(port string) {
 	router := gin.Default()
 
-	session.InitializeSession(router)
+	// initialize session.
+	router.Use(session.NewSessionHandler())
 
+	// initialize favicon.
 	router.Static("favicon.ico", "app/assets/favicon.ico")
-	router.Use(middleware.ServeFavicon("./favicon.ico"))
+	router.Use(middleware.NewFaviconHandler())
 
+	// initialize google authentication.
 	redirectUrl := os.Getenv("REDIRECT_URL")
 	credFilePath := os.Getenv("CRED_FILE_PATH")
 	secret := []byte(os.Getenv("GOOGLE_SECRET"))
-	scopes := []string{"https://www.googleapis.com/auth/userinfo.email", "openid"}
+	scopes := []string{"openid"}
 	middleware.Setup(redirectUrl, credFilePath, scopes, secret)
 	router.Use(middleware.Auth())
 
+	// initialize main.
 	{
 		api := api.NewLinksApi(
 			repositories.NewUserRepository(database.Database()),
@@ -34,12 +38,12 @@ func Open(port string) {
 			repositories.NewLinkListRepository(database.Database()),
 			repositories.NewLinkListRelationRepository(database.Database()),
 		)
-		router4user := router.Group("/users/:user_id/links")
-		router4user.GET("", api.Index)
-		router4user.GET("/:link_id", api.Show)
-		router4user.POST("", api.Create)
-		router4user.PUT("", api.Update)
-		router4user.DELETE("/:link_id", api.Delete)
+		users := router.Group("/users/:user_id/links")
+		users.GET("", api.Index)
+		users.GET("/:link_id", api.Show)
+		users.POST("", api.Create)
+		users.PUT("", api.Update)
+		users.DELETE("/:link_id", api.Delete)
 	}
 
 	router.Run(port)
