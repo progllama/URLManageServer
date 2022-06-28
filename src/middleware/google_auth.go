@@ -95,7 +95,7 @@ func GetLoginURL(state string) string {
 	return conf.AuthCodeURL(state)
 }
 
-func Auth() gin.HandlerFunc {
+func NewAuthHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Handle the exchange code to initiate a transport.
 		session := sessions.Default(ctx)

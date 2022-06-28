@@ -28,7 +28,7 @@ func Open(port string) {
 	secret := []byte(os.Getenv("GOOGLE_SECRET"))
 	scopes := []string{"openid"}
 	middleware.Setup(redirectUrl, credFilePath, scopes, secret)
-	router.Use(middleware.Auth())
+	router.Use(middleware.NewAuthHandler())
 
 	// initialize main.
 	{

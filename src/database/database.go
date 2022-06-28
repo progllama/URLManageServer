@@ -49,7 +49,7 @@ func BuildDNS(host, port, user, dbname, password string) string {
 		host,
 		port,
 		user,
-		password,
+		dbname,
 		password,
 	)
 }
