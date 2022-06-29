@@ -32,6 +32,7 @@ func Open(database string, dsn string) {
 			panic(err)
 		}
 	}
+	Migrate()
 }
 
 func Close() {

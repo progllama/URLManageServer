@@ -21,7 +21,7 @@ func main() {
 		os.Getenv("POSTGRES_DBNAME"),
 		os.Getenv("POSTGRES_PASSWORD"),
 	))
-	server.Open("PORT")
+	server.Open(os.Getenv("PORT"))
 }
 
 func loadEnvironment() {

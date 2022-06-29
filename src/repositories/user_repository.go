@@ -38,9 +38,9 @@ func (repo *userRepositoryImplPostgres) Find(id int) (models.User, error) {
 	return user, err
 }
 
-func (repo *userRepositoryImplPostgres) FindByOpenID(email string) (models.User, error) {
+func (repo *userRepositoryImplPostgres) FindByOpenID(openID string) (models.User, error) {
 	var user models.User
-	err := repo.db.Where("email=?", email).First(&user).Error
+	err := repo.db.Where("open_id=?", openID).First(&user).Error
 	return user, err
 }
 
