@@ -3,3 +3,6 @@ psql.env
 *.env
 data/redis
 .vagrant
+**/gorm.db
+**/credential.json
+bin/

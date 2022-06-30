@@ -13,7 +13,8 @@ import (
 )
 
 // パスの区切り文字にはos関係なくスラッシュで渡す。
-func ServeFavicon(path string) gin.HandlerFunc {
+func NewFaviconHandler() gin.HandlerFunc {
+	path := os.Getenv("FAVICON_PATH")
 	// /区切りのパスをosの区切り文字でのパスに変換。
 	path = filepath.FromSlash(path)
 	// から文字でないかつOSの区切り文字でないなら

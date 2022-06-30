@@ -91,11 +91,29 @@ func LoginHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"authorization_endpoint": GetLoginURL(stateValue)})
 }
 
+func RawLoginHandler(ctx *gin.Context) {
+	stateValue := randToken()
+	session := sessions.Default(ctx)
+	session.Set(stateKey, stateValue)
+	session.Save()
+	ctx.Writer.Write([]byte(`
+	<html>
+		<head>
+			<title>Golang Google</title>
+		</head>
+	  <body>
+			<a href='` + GetLoginURL(stateValue) + `'>
+				<button>Login with Google!</button>
+			</a>
+		</body>
+	</html>`))
+}
+
 func GetLoginURL(state string) string {
 	return conf.AuthCodeURL(state)
 }
 
-func Auth() gin.HandlerFunc {
+func NewAuthHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Handle the exchange code to initiate a transport.
 		session := sessions.Default(ctx)
@@ -136,9 +154,7 @@ func Auth() gin.HandlerFunc {
 		_, err = repository.FindByOpenID(userInfo.Id)
 		if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 			repository.Add(models.User{OpenID: userInfo.Id})
-		}
-
-		if err != nil {
+		} else if err != nil {
 			glog.Errorf("[Gin-OAuth] Failed to retrieve user data: %v", err)
 			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to retrieve user data: %v", err))
 			return
