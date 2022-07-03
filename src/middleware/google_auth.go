@@ -47,7 +47,7 @@ func init() {
 	gob.Register(goauth.Userinfo{})
 }
 
-func randToken() string {
+func RandToken() string {
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
 		glog.Fatalf("[Gin-OAuth] Failed to read rand: %v", err)
@@ -81,32 +81,6 @@ func SetUserRepository(repo repositories.UserRepository) {
 
 func Session(name string, store sessions.Store) gin.HandlerFunc {
 	return sessions.Sessions(name, store)
-}
-
-func LoginHandler(ctx *gin.Context) {
-	stateValue := randToken()
-	session := sessions.Default(ctx)
-	session.Set(stateKey, stateValue)
-	session.Save()
-	ctx.JSON(http.StatusOK, gin.H{"authorization_endpoint": GetLoginURL(stateValue)})
-}
-
-func RawLoginHandler(ctx *gin.Context) {
-	stateValue := randToken()
-	session := sessions.Default(ctx)
-	session.Set(stateKey, stateValue)
-	session.Save()
-	ctx.Writer.Write([]byte(`
-	<html>
-		<head>
-			<title>Golang Google</title>
-		</head>
-	  <body>
-			<a href='` + GetLoginURL(stateValue) + `'>
-				<button>Login with Google!</button>
-			</a>
-		</body>
-	</html>`))
 }
 
 func GetLoginURL(state string) string {
@@ -162,7 +136,9 @@ func NewAuthHandler() gin.HandlerFunc {
 
 		ctx.Set("user", userInfo)
 
-		session.Set(sessionID, userInfo)
+		session.Set("logged_in", true)
+		session.Set("session_id", sessionID)
+
 		if err := session.Save(); err != nil {
 			glog.Errorf("[Gin-OAuth] Failed to save session: %v", err)
 			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to save session: %v", err))

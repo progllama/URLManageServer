@@ -10,26 +10,38 @@ import (
 
 	"url_manager/api"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	goauth "google.golang.org/api/oauth2/v2"
 )
 
 func Open(port string) {
 	router := gin.Default()
 
+	// load template.
+	router.LoadHTMLGlob("template/*")
+
 	// initialize session.
 	router.Use(session.NewSessionHandler())
-
-	if os.Getenv("MODE") == "dev" {
-		router.GET("/test", func(ctx *gin.Context) {
-			ctx.String(http.StatusOK, "At least app is running.")
-		})
-		router.GET("/test/login", middleware.RawLoginHandler)
-	}
 
 	// initialize favicon.
 	// router.Static("favicon.ico", "app/assets/favicon.ico")
 	// router.Use(middleware.NewFaviconHandler())
+
+	// initialize static
+	router.Static("/assets", "./assets")
+	router.StaticFile("/favicon.ico", "./resources/favicon.ico")
+
+	//initialize home
+	router.GET("/home", func(ctx *gin.Context) {
+		stateValue := middleware.RandToken()
+		session := sessions.Default(ctx)
+		session.Set("state", stateValue)
+		session.Save()
+		ctx.HTML(http.StatusOK, "index.html", gin.H{
+			"auth_url":  middleware.GetLoginURL(stateValue),
+			"logged_in": session.Get("logged_in"),
+		})
+	})
 
 	// initialize google authentication.
 	redirectUrl := os.Getenv("REDIRECT_URL")
@@ -39,20 +51,6 @@ func Open(port string) {
 	middleware.SetUserRepository(repositories.NewUserRepository(database.Database()))
 	middleware.Setup(redirectUrl, credFilePath, scopes, secret)
 	router.Use(middleware.NewAuthHandler())
-	if os.Getenv("MODE") == "dev" {
-		router.GET("/auth/google", func(ctx *gin.Context) {
-			var (
-				res goauth.Userinfo
-				ok  bool
-			)
-
-			val := ctx.MustGet("user")
-			if res, ok = val.(goauth.Userinfo); !ok {
-				res = goauth.Userinfo{Name: "no user"}
-			}
-			ctx.String(http.StatusOK, "success login"+res.Id)
-		})
-	}
 
 	// initialize main.
 	{

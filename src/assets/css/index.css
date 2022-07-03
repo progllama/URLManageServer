@@ -1,0 +1,25 @@
+.root-wrapper {
+    max-height: 100vh;
+    max-width: 100vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.sidebar-wrapper {
+    min-width: 200px;
+    align-self: stretch;
+    overflow: scroll;
+}
+
+.content-wrapper {
+    flex: auto;
+    align-self: stretch;
+    overflow: scroll;
+}
