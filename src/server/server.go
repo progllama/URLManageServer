@@ -37,9 +37,17 @@ func Open(port string) {
 		session := sessions.Default(ctx)
 		session.Set("state", stateValue)
 		session.Save()
+
+		data := []HomeData{
+			{"title1", "/hogehoge"},
+			{"title2", "/hogehoge"},
+			{"title3", "/hogehoge"},
+		}
+
 		ctx.HTML(http.StatusOK, "index.html", gin.H{
 			"auth_url":  middleware.GetLoginURL(stateValue),
 			"logged_in": session.Get("logged_in"),
+			"data":      data,
 		})
 	})
 
@@ -69,4 +77,9 @@ func Open(port string) {
 	}
 
 	router.Run(port)
+}
+
+type HomeData struct {
+	Title string
+	Url   string
 }

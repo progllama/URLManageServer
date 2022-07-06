@@ -1,0 +1,41 @@
+a {
+    color: white;
+    text-decoration: none;
+}
+
+a:hover {
+    color: white;
+}
+
+.root-wrapper {
+    max-height: 100vh;
+    max-width: 100vw;
+    display: flex;
+    flex-direction: column;
+    background-color: #4D4D4D;
+    color: white;
+}
+
+.main-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.sidebar-wrapper {
+    min-width: 300px;
+    align-self: stretch;
+    overflow: scroll;
+
+    padding: 10px;
+    border-right: 2px solid #333333;
+}
+
+.content-wrapper {
+    flex: auto;
+    align-self: stretch;
+    overflow: scroll;
+    padding-top: 15px;
+    padding-left: 15px;
+}
