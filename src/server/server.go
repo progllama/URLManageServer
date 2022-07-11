@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	goauth "google.golang.org/api/oauth2/v2"
 )
 
 func Open(port string) {
@@ -31,12 +32,32 @@ func Open(port string) {
 	router.Static("/assets", "./assets")
 	router.StaticFile("/favicon.ico", "./resources/favicon.ico")
 
-	//initialize home
 	router.GET("/home", func(ctx *gin.Context) {
-		stateValue := middleware.RandToken()
 		session := sessions.Default(ctx)
-		session.Set("state", stateValue)
-		session.Save()
+
+		var loggedIn = false
+
+		var userInfo goauth.Userinfo
+		if v := session.Get("ginoauth_google_session"); v != nil {
+			userInfo = v.(goauth.Userinfo)
+			loggedIn = true
+		} else {
+			userInfo = goauth.Userinfo{}
+		}
+
+		var loginUrl = ""
+		if !loggedIn {
+			stateValue := middleware.RandToken()
+			session.Set("state", stateValue)
+			session.Save()
+			loginUrl = middleware.GetLoginURL(stateValue)
+		}
+
+		repo := repositories.NewUserRepository(database.Database())
+		user, err := repo.FindByOpenID(userInfo.Id)
+		if err != nil {
+			// ctx.AbortWithError(http.StatusInternalServerError, err)
+		}
 
 		data := []HomeData{
 			{"title1", "/hogehoge"},
@@ -45,10 +66,18 @@ func Open(port string) {
 		}
 
 		ctx.HTML(http.StatusOK, "index.html", gin.H{
-			"auth_url":  middleware.GetLoginURL(stateValue),
-			"logged_in": session.Get("logged_in"),
+			"user_id":   user.ID,
+			"auth_url":  loginUrl,
+			"logged_in": loggedIn,
 			"data":      data,
 		})
+	})
+
+	router.GET("/auth/logout", func(ctx *gin.Context) {
+		session := sessions.Default(ctx)
+		session.Clear()
+		session.Save()
+		ctx.Redirect(302, "/home")
 	})
 
 	// initialize google authentication.
@@ -60,6 +89,7 @@ func Open(port string) {
 	middleware.Setup(redirectUrl, credFilePath, scopes, secret)
 	router.Use(middleware.NewAuthHandler())
 
+	router.GET("/auth/google", api.SignIn(repositories.NewUserRepository(database.Database())))
 	// initialize main.
 	{
 		api := api.NewLinksApi(

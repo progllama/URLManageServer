@@ -13,15 +13,8 @@ import (
 func main() {
 	setLogLevel()
 	loadEnvironment()
-	// host=%s port=%s user=%s dbname=%s password=%s sslmode=disable
-	database.Open("postgres", database.BuildDNS(
-		os.Getenv("POSTGRES_HOST"),
-		os.Getenv("POSTGRES_PORT"),
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_DBNAME"),
-		os.Getenv("POSTGRES_PASSWORD"),
-	))
-	server.Open(os.Getenv("PORT"))
+	database.Open()
+	server.Open(":8000")
 }
 
 func loadEnvironment() {

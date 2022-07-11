@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"url_manager/models"
@@ -168,11 +169,13 @@ func (api *linksApi) Create(ctx *gin.Context) {
 	}
 
 	var link models.Link
-	ctx.Bind(&link)
+	err = ctx.ShouldBindJSON(&link)
 	if err != nil {
+		log.Println(err)
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
+	link.UserID = int(user.ID)
 
 	if link.UserID != int(user.ID) {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
@@ -209,7 +212,7 @@ func (api *linksApi) Update(ctx *gin.Context) {
 	}
 
 	var link models.Link
-	ctx.Bind(&link)
+	ctx.BindJSON(&link)
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return

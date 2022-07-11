@@ -39,7 +39,7 @@
             <ul class="navbar-nav">
               {{ if .logged_in }}
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="/auth/logout">Login</a>
+                <a class="nav-link" aria-current="page" href="/auth/logout">Logout</a>
               </li>
               {{ else }}
               <li class="nav-item">
@@ -61,50 +61,39 @@
       </div>
 
       <div class="content-wrapper">
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
-        <p>test</p>
+        <ul class="links" id="{{ .user_id }}">
+        </ul>
+        <div class="modal-form hide">
+          <button class="modal-close">
+            ✖️
+          </button>
+          <div class="form-wrapper">
+            <form action="/users/{{ .user_id }}/links">
+              <div class="title-form form-item">
+                <label>Title</label>
+                <input type="text" name="title" />
+              </div>
+              <div class="url-form form-item">
+                <label>Url</label>
+                <input type="text" name="url" />
+              </div>
+              <div class="submit form-item">
+                <input type="button" value="Send" />
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
+
+    <div class="add-button-wrapper">
+      <button class="modal-open">
+        <div class="post-btn">
+          <i class="fas fa-plus"></i>
+        </div>
+      </button>
+    </div>
+
   </div>
 
   <!-- Optional JavaScript; choose one of the two! -->

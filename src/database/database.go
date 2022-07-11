@@ -2,11 +2,10 @@ package database
 
 import (
 	"fmt"
-	"os"
+	"log"
 	"url_manager/models"
 
 	_ "github.com/lib/pq"
-	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -20,17 +19,10 @@ func Database() *gorm.DB {
 	return db
 }
 
-func Open(database string, dsn string) {
-	if os.Getenv("MODE") == "dev" {
-		db, err = gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
-		if err != nil {
-			panic(err)
-		}
-	} else {
-		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-		if err != nil {
-			panic(err)
-		}
+func Open() {
+	db, err = gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
+	if err != nil {
+		log.Fatal(err)
 	}
 	Migrate()
 }
@@ -38,12 +30,12 @@ func Open(database string, dsn string) {
 func Close() {
 	connection, err := db.DB()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	err = connection.Close()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
 

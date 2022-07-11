@@ -13,7 +13,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"url_manager/models"
 	"url_manager/repositories"
 
 	"github.com/gin-contrib/sessions"
@@ -79,10 +78,6 @@ func SetUserRepository(repo repositories.UserRepository) {
 	repository = repo
 }
 
-func Session(name string, store sessions.Store) gin.HandlerFunc {
-	return sessions.Sessions(name, store)
-}
-
 func GetLoginURL(state string) string {
 	return conf.AuthCodeURL(state)
 }
@@ -95,6 +90,7 @@ func NewAuthHandler() gin.HandlerFunc {
 		existingSession := session.Get(sessionID)
 		if userInfo, ok := existingSession.(goauth.Userinfo); ok {
 			ctx.Set("user", userInfo)
+			session.Set("logged_in", true)
 			ctx.Next()
 			return
 		}
@@ -127,7 +123,7 @@ func NewAuthHandler() gin.HandlerFunc {
 
 		_, err = repository.FindByOpenID(userInfo.Id)
 		if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-			repository.Add(models.User{OpenID: userInfo.Id})
+			// repository.Add(models.User{OpenID: userInfo.Id})
 		} else if err != nil {
 			glog.Errorf("[Gin-OAuth] Failed to retrieve user data: %v", err)
 			ctx.AbortWithError(http.StatusInternalServerError, fmt.Errorf("failed to retrieve user data: %v", err))
@@ -137,7 +133,7 @@ func NewAuthHandler() gin.HandlerFunc {
 		ctx.Set("user", userInfo)
 
 		session.Set("logged_in", true)
-		session.Set("session_id", sessionID)
+		session.Set(sessionID, userInfo)
 
 		if err := session.Save(); err != nil {
 			glog.Errorf("[Gin-OAuth] Failed to save session: %v", err)

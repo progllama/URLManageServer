@@ -6,8 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
-	"github.com/gin-contrib/sessions/redis"
+	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,20 +28,8 @@ func NewSessionHandler() gin.HandlerFunc {
 }
 
 func makeStore() sessions.Store {
-	if os.Getenv("MODE") == "dev" {
-		store := cookie.NewStore([]byte("on develop"))
-		if err != nil {
-			log.Fatal(err)
-
-		}
-		return store
-	} else {
-		store, err := redis.NewStore(size, network, address, password, []byte(secret))
-		if err != nil {
-			log.Fatal(err)
-		}
-		return store
-	}
+	store := memstore.NewStore([]byte(secret))
+	return store
 }
 
 func loadConfig() {
