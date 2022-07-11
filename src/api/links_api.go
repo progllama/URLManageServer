@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -56,46 +55,48 @@ func (api *linksApi) Index(ctx *gin.Context) {
 		return
 	}
 
-	lists, err := api.linkListRepository.FindByUserId(int(user.ID))
+	// lists, err := api.linkListRepository.FindByUserId(int(user.ID))
+	// lists, err := api.linkRepository.All()
+	lists, err := api.linkRepository.FindByUserId(int(user.ID))
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	relations, err := api.linkListRelationRepository.FindByUserId(int(user.ID))
-	if err != nil {
-		ctx.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
+	// relations, err := api.linkListRelationRepository.FindByUserId(int(user.ID))
+	// if err != nil {
+	// 	ctx.AbortWithStatus(http.StatusInternalServerError)
+	// 	return
+	// }
 
-	var roots []int
-	for _, list := range lists {
-		isChildList := false
-		for _, relation := range relations {
-			if int(list.ID) == relation.ChildListID {
-				isChildList = true
-				break
-			}
-		}
+	// var roots []int
+	// for _, list := range lists {
+	// 	isChildList := false
+	// 	for _, relation := range relations {
+	// 		if int(list.ID) == relation.ChildListID {
+	// 			isChildList = true
+	// 			break
+	// 		}
+	// 	}
 
-		if !isChildList {
-			roots = append(roots, int(list.ID))
-		}
-	}
+	// 	if !isChildList {
+	// 		roots = append(roots, int(list.ID))
+	// 	}
+	// }
 
-	var urlsToEachList []string
-	for _, id := range roots {
-		url := "/users/" + fmt.Sprint(user.ID) + "/links/" + fmt.Sprint(id)
-		urlsToEachList = append(urlsToEachList, url)
-	}
+	// var urlsToEachList []string
+	// for _, id := range roots {
+	// 	url := "/users/" + fmt.Sprint(user.ID) + "/links/" + fmt.Sprint(id)
+	// 	urlsToEachList = append(urlsToEachList, url)
+	// }
 
-	urlsJson, err := json.Marshal(urlsToEachList)
-	if err != nil {
-		ctx.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
+	// urlsJson, err := json.Marshal(urlsToEachList)
+	// if err != nil {
+	// 	ctx.AbortWithStatus(http.StatusInternalServerError)
+	// 	return
+	// }
 
-	ctx.JSON(http.StatusOK, urlsJson)
+	ctx.JSON(http.StatusOK, gin.H{"links": lists})
 }
 
 func (api *linksApi) Show(ctx *gin.Context) {

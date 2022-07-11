@@ -10,6 +10,7 @@ type LinkRepository interface {
 	All() ([]models.Link, error)
 	Find(int) (models.Link, error)
 	FindByListId(int) ([]models.Link, error)
+	FindByUserId(int) ([]models.Link, error)
 	Add(models.Link) error
 	Update(models.Link) error
 	Remove(int) error
@@ -41,6 +42,12 @@ func (repo *linkRepository) Find(id int) (models.Link, error) {
 func (repo *linkRepository) FindByListId(id int) ([]models.Link, error) {
 	var links []models.Link
 	err := repo.db.Where("link_list_id=?", id).Find(&links).Error
+	return links, err
+}
+
+func (repo *linkRepository) FindByUserId(id int) ([]models.Link, error) {
+	var links []models.Link
+	err := repo.db.Where("user_id=?", id).Find(&links).Error
 	return links, err
 }
 
