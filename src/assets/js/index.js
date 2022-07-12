@@ -1,3 +1,13 @@
+
+const registry = {
+    ErrMsgState: "HIDE"
+}
+
+const HIDE = "HIDE";
+const SHOW = "SHOW";
+const OPEN = "OPEN";
+const CLOSE = "CLOSE";
+
 window.onload = () => {
     const listItems = document.getElementsByClassName("toggle-icon");
     for (let v of listItems) {
@@ -74,6 +84,20 @@ window.onload = () => {
                     linkList.appendChild(item)
                 }
             })
+        }).catch((err) => {
+            console.log(err);
+            const msg = document.getElementsByClassName("fault-message")[0];
+            msg.classList.toggle("hide")
+            msg.classList.toggle("show")
+            registry.ErrMsgState = "SHOW"
+        });
+
+        document.body.addEventListener("click", () => {
+            if (registry.ErrMsgState == "HIDE") return;
+            const msg = document.getElementsByClassName("fault-message")[0];
+            msg.classList.toggle("hide")
+            msg.classList.toggle("show")
+            registry.ErrMsgState = "HIDE";
         });
     })
 

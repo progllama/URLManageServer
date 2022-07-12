@@ -55,6 +55,7 @@
       </nav>
     </div>
 
+    {{ if .logged_in }}
     <div class="main-wrapper">
       <div class="sidebar-wrapper">
         {{ template "sidebar.tmpl" .}}
@@ -94,7 +95,17 @@
       </button>
     </div>
 
+    <div class="fault-message hide">
+      <div class="alert alert-danger">
+        Error
+      </div>
+    </div>
   </div>
+  {{ else }}
+  <div class="login-reminder">
+    Please Login
+  </div>
+  {{ end }}
 
   <!-- Optional JavaScript; choose one of the two! -->
 
