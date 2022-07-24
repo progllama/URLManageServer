@@ -59,10 +59,15 @@ func Open(port string) {
 			// ctx.AbortWithError(http.StatusInternalServerError, err)
 		}
 
-		data := []HomeData{
-			{"title1", "/hogehoge"},
-			{"title2", "/hogehoge"},
-			{"title3", "/hogehoge"},
+		listRepo := repositories.NewLinkListRepository(database.Database())
+		lists, err := listRepo.FindByUserId(int(user.ID))
+
+		data := []HomeData{}
+		for _, v := range lists {
+			data = append(data, HomeData{
+				ID:    int(v.ID),
+				Title: v.Title,
+			})
 		}
 
 		ctx.HTML(http.StatusOK, "index.html", gin.H{
@@ -106,10 +111,17 @@ func Open(port string) {
 		users.DELETE("/:link_id", api.Delete)
 	}
 
+	{
+		api := api.NewLinkListsApi(repositories.NewLinkListRepository(database.Database()))
+		router.POST("/users/:user_id/link_lists", api.Create)
+		router.DELETE("/users/:user_id/link_lists/:list_id", api.Delete)
+	}
+
 	router.Run(port)
 }
 
 type HomeData struct {
+	ID    int
 	Title string
 	Url   string
 }

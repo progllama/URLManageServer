@@ -260,12 +260,19 @@ func (api *linksApi) Delete(ctx *gin.Context) {
 		return
 	}
 
-	if link.UserID != int(user.ID) {
+	linkId, _ := strconv.Atoi(ctx.Param("link_id"))
+	dblink, err := api.linkRepository.Find(linkId)
+	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	err = api.linkRepository.Remove(int(link.ID))
+	if dblink.UserID != int(user.ID) {
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	err = api.linkRepository.Remove(int(dblink.ID))
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return

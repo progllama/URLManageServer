@@ -62,7 +62,7 @@ func (repo *linkRepository) Update(url models.Link) error {
 }
 
 func (repo *linkRepository) Remove(id int) error {
-	result := repo.db.Delete(models.Link{}, id)
+	result := repo.db.Where("id=?", id).Delete(&models.Link{})
 	return result.Error
 }
 

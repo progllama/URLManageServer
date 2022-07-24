@@ -22,6 +22,7 @@
   <script src="./assets/js/index.js"></script>
 
   <title>url plumber</title>
+  <script>const UserID = {{ .user_id }}</script>
 </head>
 
 <body>
@@ -43,10 +44,7 @@
               </li>
               {{ else }}
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="{{ .auth_url }}">Login</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="{{ .auth_url }}">Sign up</a>
+                <a class="nav-link" aria-current="page" href="{{ .auth_url }}">Login or SignUp</a>
               </li>
               {{ end }}
             </ul>
@@ -62,8 +60,8 @@
       </div>
 
       <div class="content-wrapper">
-        <ul class="links" id="{{ .user_id }}">
-        </ul>
+        <div class="links" id="{{ .user_id }}">
+        </div>
         <div class="modal-form hide">
           <button class="modal-close">
             ✖️
@@ -106,6 +104,32 @@
     Please Login
   </div>
   {{ end }}
+
+  <div class="delete-confirm-modal">
+    <div class="delete-confirm-text">
+      Delete?
+    </div>
+    <div class="delete-target">
+      <!-- This place is used display target title. -->
+    </div>
+    <div class="delete-button-wrapper">
+      <div class="delete-cancel">
+        Cancel
+      </div>
+      <div class="delete-execute">
+        Delete
+      </div>
+    </div>
+  </div>
+
+  <div class="detail">
+    <div class="detail clicked">
+      clicked:0(後々訪問回数を記録できるようにする。)
+    </div>
+  </div>
+
+  <div class="edit">
+  </div>
 
   <!-- Optional JavaScript; choose one of the two! -->
 

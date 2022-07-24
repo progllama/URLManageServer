@@ -1,13 +1,17 @@
 {{ define "sidebar.tmpl" }}
-<h2><a href="/home">Home</a></h2>
+<div class="sidebar-header">
+    <h2 id="sidebar-header-text"><a href="/home">Home</a></h2>
+    <div class="add-dir"><i class="fa fa-plus"></i></div>
+    <div class="remove-dir"><i class="fa fa-trash"></i></div>
+</div>
 {{ template "menu" . }}
 {{ end }}
 
 {{ define "menu"}}
 {{range $index, $link := .data}}
-<div>
+<div draggable="true" class="sidebar-item gray" id="side-{{ $link.ID}}">
 <i class="toggle-icon fa-solid fa-angle-down"></i>
-<span class="title">{{ $link.Title }}<span>
+<span class="title sidebar-item-title">{{ $link.Title }}<span>
 </div>
 {{end}}
 {{ end }}

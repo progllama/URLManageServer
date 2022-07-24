@@ -55,7 +55,7 @@ func (repo *linkListRepository) Update(list models.LinkList) error {
 }
 
 func (repo *linkListRepository) Remove(id int) error {
-	result := repo.db.Delete(models.LinkList{}, id)
+	result := repo.db.Delete(&models.LinkList{}, id)
 	return result.Error
 }
 
