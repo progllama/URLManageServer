@@ -3,55 +3,57 @@ package database
 import (
 	"fmt"
 	"log"
-	"url_manager/models"
+	"os"
+	"strings"
 
-	_ "github.com/lib/pq"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var (
-	db  *gorm.DB
-	err error
-)
+var db *gorm.DB
 
-func Database() *gorm.DB {
-	return db
-}
-
-func Open() {
-	db, err = gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
-	if err != nil {
-		log.Fatal(err)
-	}
-	Migrate()
-}
-
-func Close() {
-	connection, err := db.DB()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = connection.Close()
+func Connect() {
+	dsn := getDSN()
+	config := getConfig()
+	var err error
+	db, err = openDB(dsn, config)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func Migrate() {
-	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Link{})
-	db.AutoMigrate(&models.LinkList{})
-	db.AutoMigrate(&models.LinkListRelation{})
+func Disconnect() {
+	if con, err := db.DB(); err != nil {
+		con.Close()
+	}
 }
 
-func BuildDNS(host, port, user, dbname, password string) string {
-	return fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
-		host,
-		port,
-		user,
-		dbname,
-		password,
-	)
+func getDSN() string {
+	keys := dsnKeys()
+	dsn := make([]string, len(keys))
+	for i, key := range keys {
+		value := os.Getenv(strings.ToUpper(key))
+		dsn[i] = fmt.Sprintf("%s=%s ", key, value)
+	}
+	return strings.Join(dsn, " ")
+}
+
+func getConfig() *gorm.Config {
+	return &gorm.Config{}
+}
+
+func openDB(dsn string, config *gorm.Config) (*gorm.DB, error) {
+	return gorm.Open(postgres.Open(dsn), config)
+}
+
+func dsnKeys() []string {
+	return []string{
+		"host",
+		"user",
+		"password",
+		"dbname",
+		"port",
+		"sslmode",
+		"TimeZone",
+	}
 }
