@@ -2,26 +2,32 @@ package controllers
 
 import (
 	"net/http"
+	"url_manager/model"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetLinks(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, nil)
+	var links []model.Link
+	ctx.JSON(http.StatusOK, links)
 }
 
 func GetLink(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, nil)
+	var link model.Link
+	ctx.JSON(http.StatusOK, link)
 }
 
 func CreateLink(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, nil)
+	var link model.Link
+	ctx.JSON(http.StatusOK, link)
 }
 
 func UpdateLink(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, nil)
+	var link model.Link
+	ctx.JSON(http.StatusOK, link)
 }
 
 func DeleteLink(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, nil)
+	empty := gin.H{}
+	ctx.JSON(http.StatusOK, empty)
 }

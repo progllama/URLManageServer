@@ -28,6 +28,10 @@ func Disconnect() {
 	}
 }
 
+func GetDB() *gorm.DB {
+	return db
+}
+
 func getDSN() string {
 	keys := dsnKeys()
 	dsn := make([]string, len(keys))

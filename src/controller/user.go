@@ -2,26 +2,32 @@ package controllers
 
 import (
 	"net/http"
+	"url_manager/model"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetUsers(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, nil)
+	var users []model.User
+	ctx.JSON(http.StatusOK, users)
 }
 
 func GetUser(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, nil)
+	var user model.User
+	ctx.JSON(http.StatusOK, user)
 }
 
 func CreateUser(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, nil)
+	var user model.User
+	ctx.JSON(http.StatusOK, user)
 }
 
 func UpdateUser(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, nil)
+	var user model.User
+	ctx.JSON(http.StatusOK, user)
 }
 
 func DeleteUser(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, nil)
+	empty := gin.H{}
+	ctx.JSON(http.StatusOK, empty)
 }

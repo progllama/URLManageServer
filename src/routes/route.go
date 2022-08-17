@@ -3,6 +3,7 @@ package route
 import (
 	"net/http"
 	controllers "url_manager/controller"
+	"url_manager/session"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,6 +22,7 @@ func RegisterRoot(e *gin.Engine) {
 
 func RegisterUserRoutes(e *gin.Engine) {
 	g := e.Group("/users")
+	g.Use(session.Middleware())
 	g.GET("/", controllers.GetUsers)
 	g.GET("/:id", controllers.GetUser)
 	g.POST("/", controllers.CreateUser)
@@ -30,9 +32,20 @@ func RegisterUserRoutes(e *gin.Engine) {
 
 func RegisterLinkRoutes(e *gin.Engine) {
 	g := e.Group("/links")
+	g.Use(session.Middleware())
 	g.GET("/", controllers.GetLinks)
 	g.GET("/:id", controllers.GetLink)
 	g.POST("/", controllers.CreateLink)
 	g.PUT("/:id", controllers.UpdateLink)
 	g.DELETE("/:id", controllers.DeleteLink)
+}
+
+func RegisterCategoryRoutes(e *gin.Engine) {
+	g := e.Group("/categories")
+	g.Use(session.Middleware())
+	g.GET("/", controllers.GetCategories)
+	g.GET("/:id", controllers.GetCategory)
+	g.POST("/", controllers.CreateCategory)
+	g.PUT("/:id", controllers.UpdateCategory)
+	g.DELETE("/:id", controllers.DeleteCategory)
 }
