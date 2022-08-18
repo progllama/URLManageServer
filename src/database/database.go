@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"url_manager/model"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -20,6 +21,12 @@ func Connect() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	db.AutoMigrate(
+		&model.User{},
+		&model.Category{},
+		&model.Link{},
+	)
 }
 
 func Disconnect() {

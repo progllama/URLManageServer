@@ -41,7 +41,7 @@ func RegisterLinkRoutes(e *gin.Engine) {
 }
 
 func RegisterCategoryRoutes(e *gin.Engine) {
-	g := e.Group("/categories")
+	g := e.Group("users/:user_id/categories")
 	g.Use(session.Middleware())
 	g.GET("/", controllers.GetCategories)
 	g.GET("/:id", controllers.GetCategory)
