@@ -9,20 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetUsers(ctx *gin.Context) {
-	repo := getUserRepo()
-	userId := ctx.Param(":user_id")
-	users := repo.All(userId)
-	ctx.JSON(http.StatusOK, users)
-}
-
-func GetUser(ctx *gin.Context) {
-	repo := getUserRepo()
-	id, _ := strconv.Atoi(ctx.Param(":id"))
-	user := repo.Get(id)
-	ctx.JSON(http.StatusOK, user)
-}
-
 func CreateUser(ctx *gin.Context) {
 	repo := getUserRepo()
 	var create model.User
@@ -44,8 +30,7 @@ func DeleteUser(ctx *gin.Context) {
 	repo := getUserRepo()
 	id, _ := strconv.Atoi(ctx.Param(":id"))
 	repo.Delete(id)
-	empty := gin.H{}
-	ctx.JSON(http.StatusOK, empty)
+	ctx.JSON(http.StatusOK, emptyBody)
 }
 
 func getUserRepo() *repository.UserRepository {

@@ -11,40 +11,34 @@ import (
 
 func GetLinks(ctx *gin.Context) {
 	repo := getLinkRepo()
-	userId := ctx.Param(":user_id")
+	userId, _ := strconv.Atoi(ctx.Param("user_id"))
 	links := repo.All(userId)
 	ctx.JSON(http.StatusOK, links)
 }
 
-func GetLink(ctx *gin.Context) {
-	repo := getLinkRepo()
-	id, _ := strconv.Atoi(ctx.Param(":id"))
-	link := repo.Get(id)
-	ctx.JSON(http.StatusOK, link)
-}
-
 func CreateLink(ctx *gin.Context) {
 	repo := getLinkRepo()
+	userId, _ := strconv.Atoi(ctx.Param("user_id"))
 	var create model.Link
 	ctx.BindJSON(&create)
-	created := repo.Create(create)
+	created := repo.Create(userId, create)
 	ctx.JSON(http.StatusOK, created)
 }
 
 func UpdateLink(ctx *gin.Context) {
 	repo := getLinkRepo()
+	id, _ := strconv.Atoi(ctx.Param("id"))
 	var update model.Link
 	ctx.BindJSON(&update)
-	updated := repo.Create(update)
+	updated := repo.Update(id, update)
 	ctx.JSON(http.StatusOK, updated)
 }
 
 func DeleteLink(ctx *gin.Context) {
 	repo := getLinkRepo()
-	id, _ := strconv.Atoi(ctx.Param(":id"))
+	id, _ := strconv.Atoi(ctx.Param("id"))
 	repo.Delete(id)
-	empty := gin.H{}
-	ctx.JSON(http.StatusOK, empty)
+	ctx.JSON(http.StatusOK, emptyBody)
 }
 
 func getLinkRepo() *repository.LinkRepository {

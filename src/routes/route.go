@@ -10,6 +10,7 @@ import (
 
 func RegisterRoutes(e *gin.Engine) {
 	RegisterRoot(e)
+	RegisterSignInAndOut(e)
 	RegisterUserRoutes(e)
 	RegisterLinkRoutes(e)
 }
@@ -20,32 +21,25 @@ func RegisterRoot(e *gin.Engine) {
 	e.GET("/", func(c *gin.Context) { c.HTML(http.StatusOK, "index.html", nil) })
 }
 
+func RegisterSignInAndOut(e *gin.Engine) {
+	e.GET("/sign_in", controllers.Login)
+	e.GET("/sign_out", controllers.Logout)
+}
+
 func RegisterUserRoutes(e *gin.Engine) {
 	g := e.Group("/users")
 	g.Use(session.Middleware())
-	g.GET("/", controllers.GetUsers)
-	g.GET("/:id", controllers.GetUser)
 	g.POST("/", controllers.CreateUser)
-	g.PUT("/:id", controllers.UpdateUser)
-	g.DELETE("/:id", controllers.DeleteUser)
+	g.PUT("/:user_id", controllers.Authenticate, controllers.UpdateUser)
+	g.DELETE("/:user_id", controllers.Authenticate, controllers.DeleteUser)
 }
 
 func RegisterLinkRoutes(e *gin.Engine) {
-	g := e.Group("/links")
+	g := e.Group("users/:user_id/links")
 	g.Use(session.Middleware())
+	g.Use(controllers.Authenticate)
 	g.GET("/", controllers.GetLinks)
-	g.GET("/:id", controllers.GetLink)
 	g.POST("/", controllers.CreateLink)
 	g.PUT("/:id", controllers.UpdateLink)
 	g.DELETE("/:id", controllers.DeleteLink)
-}
-
-func RegisterCategoryRoutes(e *gin.Engine) {
-	g := e.Group("users/:user_id/categories")
-	g.Use(session.Middleware())
-	g.GET("/", controllers.GetCategories)
-	g.GET("/:id", controllers.GetCategory)
-	g.POST("/", controllers.CreateCategory)
-	g.PUT("/:id", controllers.UpdateCategory)
-	g.DELETE("/:id", controllers.DeleteCategory)
 }
