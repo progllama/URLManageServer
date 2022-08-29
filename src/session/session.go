@@ -11,10 +11,12 @@ import (
 )
 
 var store redis.Store
+var hasStore = false
 
 func Middleware() gin.HandlerFunc {
-	if store == nil {
+	if !hasStore {
 		store = getStore()
+		hasStore = true
 	}
 	return sessions.Sessions("url-plumber", store)
 }

@@ -1,6 +1,9 @@
 package repository
 
-import "url_manager/model"
+import (
+	"log"
+	"url_manager/model"
+)
 
 type UserRepository struct {
 }
@@ -9,6 +12,7 @@ type UserRepository struct {
 func (repo *UserRepository) GetByUserId(uid string) model.User {
 	db := getDB()
 	var user model.User
+	log.Println(uid)
 	db.Where("user_id=?", uid).Find(&user)
 	return user
 }

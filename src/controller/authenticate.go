@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"url_manager/model"
 
@@ -21,6 +22,7 @@ func Authenticate(ctx *gin.Context) {
 func Login(ctx *gin.Context) {
 	s := sessions.Default(ctx)
 	if ok, u := authenticateUser(ctx); ok {
+		log.Println(u, s)
 		s.Set("id", u.ID)
 		s.Save()
 
@@ -41,7 +43,7 @@ func Logout(ctx *gin.Context) {
 func authenticateUser(ctx *gin.Context) (bool, *model.User) {
 	var credential model.User
 	ctx.BindJSON(&credential)
-
+	log.Println(credential)
 	repo := getUserRepo()
 	u := repo.GetByUserId(credential.UserID)
 	if u.Authenticate(&credential) {

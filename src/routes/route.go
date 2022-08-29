@@ -22,8 +22,8 @@ func RegisterRoot(e *gin.Engine) {
 }
 
 func RegisterSignInAndOut(e *gin.Engine) {
-	e.GET("/sign_in", controllers.Login)
-	e.GET("/sign_out", controllers.Logout)
+	e.POST("/sign_in", session.Middleware(), controllers.Login)
+	e.DELETE("/sign_out", session.Middleware(), controllers.Logout)
 }
 
 func RegisterUserRoutes(e *gin.Engine) {
