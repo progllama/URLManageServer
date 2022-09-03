@@ -22,13 +22,13 @@ func RegisterRoot(e *gin.Engine) {
 }
 
 func RegisterSignInAndOut(e *gin.Engine) {
-	e.POST("/sign_in", session.Middleware(), controllers.Login)
-	e.DELETE("/sign_out", session.Middleware(), controllers.Logout)
+	e.POST("/sign_in", session.Handler(), controllers.Login)
+	e.DELETE("/sign_out", session.Handler(), controllers.Logout)
 }
 
 func RegisterUserRoutes(e *gin.Engine) {
 	g := e.Group("/users")
-	g.Use(session.Middleware())
+	g.Use(session.Handler())
 	g.POST("/", controllers.CreateUser)
 	g.PUT("/:user_id", controllers.Authenticate, controllers.UpdateUser)
 	g.DELETE("/:user_id", controllers.Authenticate, controllers.DeleteUser)
@@ -36,7 +36,7 @@ func RegisterUserRoutes(e *gin.Engine) {
 
 func RegisterLinkRoutes(e *gin.Engine) {
 	g := e.Group("users/:user_id/links")
-	g.Use(session.Middleware())
+	g.Use(session.Handler())
 	g.Use(controllers.Authenticate)
 	g.GET("/", controllers.GetLinks)
 	g.POST("/", controllers.CreateLink)

@@ -30,7 +30,7 @@ func DeleteUser(ctx *gin.Context) {
 	repo := getUserRepo()
 	id, _ := strconv.Atoi(ctx.Param(":id"))
 	repo.Delete(id)
-	ctx.JSON(http.StatusOK, emptyBody)
+	ctx.JSON(http.StatusOK, gin.H{})
 }
 
 func getUserRepo() *repository.UserRepository {

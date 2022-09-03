@@ -38,7 +38,7 @@ func DeleteLink(ctx *gin.Context) {
 	repo := getLinkRepo()
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	repo.Delete(id)
-	ctx.JSON(http.StatusOK, emptyBody)
+	ctx.JSON(http.StatusOK, gin.H{})
 }
 
 func getLinkRepo() *repository.LinkRepository {

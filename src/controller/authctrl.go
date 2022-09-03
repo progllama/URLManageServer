@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// TODO: Remove
 func Authenticate(ctx *gin.Context) {
 	s := sessions.Default(ctx)
 	id := s.Get("id")
@@ -16,7 +17,7 @@ func Authenticate(ctx *gin.Context) {
 		return
 	}
 
-	ctx.AbortWithStatusJSON(http.StatusUnauthorized, emptyBody)
+	ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{})
 }
 
 func Login(ctx *gin.Context) {
@@ -30,16 +31,25 @@ func Login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusNotFound, emptyBody)
+	ctx.JSON(http.StatusNotFound, gin.H{})
 }
 
 func Logout(ctx *gin.Context) {
 	s := sessions.Default(ctx)
 	s.Clear()
 	s.Save()
-	ctx.JSON(http.StatusOK, emptyBody)
+	ctx.JSON(http.StatusOK, gin.H{})
 }
 
+func Register(ctx *gin.Context) {
+
+}
+
+func UnRegister(ctx *gin.Context) {
+
+}
+
+// TODO: Remove
 func authenticateUser(ctx *gin.Context) (bool, *model.User) {
 	var credential model.User
 	ctx.BindJSON(&credential)

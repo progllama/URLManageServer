@@ -13,7 +13,7 @@ import (
 var store redis.Store
 var hasStore = false
 
-func Middleware() gin.HandlerFunc {
+func Handler() gin.HandlerFunc {
 	if !hasStore {
 		store = getStore()
 		hasStore = true
