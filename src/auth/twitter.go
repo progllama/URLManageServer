@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
-	"net/http"
+	"log"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 )
@@ -31,6 +32,20 @@ var TwitterConf = &oauth2.Config{
 	},
 }
 
+func TwitterOAuth2RedirectHandler(ctx *gin.Context) {
+	handler := CallbackHandler{
+		Context:              ctx,
+		Config:               TwitterConf,
+		OAuth2ServiceFactory: NewOAuth2ServiceFactory(TwitterConf),
+		UserServiceFactory:   NewTwitterUserServiceFactory(),
+		LoginServiceFactory:  NewLoginServiceFactory(),
+	}
+	handler.Handle(ctx)
+
+	s := sessions.Default(ctx)
+	log.Println(s.Get(loginIdKey))
+}
+
 type TwitterUser struct {
 	ID string `json:"id"`
 }
@@ -39,50 +54,25 @@ func (u *TwitterUser) LoginId() string {
 	return u.ID
 }
 
-func TwitterOAuth2RedirectHandler(ctx *gin.Context) {
-	ch := &OAuth2Handler{
-		Context: ctx,
-		Conf:    TwitterConf,
-	}
-	token, err := ch.Handle()
-	if err != nil {
-		return
-	}
-
-	// TwitterAPIでユーザデータの取得
-	user, err := fetchTwitterUser(token)
-	if err != nil {
-		ctx.JSON(
-			ErrorCode(err),
-			gin.H{errorKey: err.Error()},
-		)
-		return
-	}
-
-	// ユーザデータがアプリに登録されていなければユーザの新規作成
-	account, err := createUserIfNotExist(user)
-	if err != nil {
-		ctx.JSON(
-			ErrorCode(err),
-			gin.H{errorKey: ErrAccessDatabase.Error() + err.Error()},
-		)
-		return
-	}
-
-	// ログイン(セッションへの保存)
-	err = login(ctx, account)
-	if err != nil {
-		ctx.JSON(
-			ErrorCode(err),
-			gin.H{errorKey: ErrOnExchange.Error() + err.Error()},
-		)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{accountIdKey: account.ID})
+type TwitterUserServiceFactory struct {
 }
 
-func fetchTwitterUser(token *oauth2.Token) (*TwitterUser, error) {
+func (factory *TwitterUserServiceFactory) NewUserService() UserService {
+	return NewTwitterUserService()
+}
+
+func NewTwitterUserServiceFactory() UserServiceFactory {
+	return &TwitterUserServiceFactory{}
+}
+
+type TwitterUserService struct {
+}
+
+func NewTwitterUserService() UserService {
+	return &TwitterUserService{}
+}
+
+func (service *TwitterUserService) Fetch(token *oauth2.Token) (User, error) {
 	client := oauth2.NewClient(
 		context.TODO(),
 		oauth2.StaticTokenSource(token),

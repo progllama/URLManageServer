@@ -1,5 +1,7 @@
 package auth
 
+import "golang.org/x/oauth2"
+
 // Google, Twitter, Facebook
 // などの外部アカウントを表現するためのクラス。
 type User interface {
@@ -7,7 +9,7 @@ type User interface {
 }
 
 type UserService interface {
-	Fetch() (User, error)
+	Fetch(token *oauth2.Token) (User, error)
 }
 
 type UserServiceFactory interface {

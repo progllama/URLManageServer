@@ -6,12 +6,16 @@ import (
 )
 
 type LoginServiceFactory interface {
-	NewLoginService(gin.Context) LoginService
+	NewLoginService(*gin.Context) LoginService
 }
 
 type LoginService interface {
 	IsLogin(loginId string) bool
 	Login(loginId string) error
+}
+
+func NewLoginServiceFactory() LoginServiceFactory {
+	return &loginServiceFactory{}
 }
 
 func NewLoginService(context *gin.Context) LoginService {
@@ -44,4 +48,11 @@ func (service *loginService) IsLogin(loginId string) bool {
 	}
 
 	return true
+}
+
+type loginServiceFactory struct {
+}
+
+func (factory *loginServiceFactory) NewLoginService(context *gin.Context) LoginService {
+	return NewLoginService(context)
 }

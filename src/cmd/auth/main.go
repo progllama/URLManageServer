@@ -24,7 +24,7 @@ func main() {
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	auth.DB = db
-	db.AutoMigrate(&auth.ConfidentialAccount{})
+	db.AutoMigrate(&auth.AccountModel{})
 
 	engine := gin.Default()
 
@@ -36,9 +36,10 @@ func main() {
 		session := sessions.Default(ctx)
 		session.Set("state", state)
 		session.Save()
-		v, _ := auth.CreateCodeVerifier()
-		codeChallenge := v.CodeChallengeS256()
-		session.Set("verifier", v.String())
+		p := auth.NewPkce()
+		v := p.CodeVerifier()
+		codeChallenge := p.CodeChallenge()
+		session.Set("verifierKey", v)
 		session.Save()
 		ctx.Writer.Write([]byte(`
 	<html>

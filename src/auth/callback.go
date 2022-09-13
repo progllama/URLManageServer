@@ -42,7 +42,7 @@ func (handler *CallbackHandler) fetchUser() {
 		return
 	}
 	service := handler.getNewUserService()
-	handler.user, handler.err = service.Fetch()
+	handler.user, handler.err = service.Fetch(handler.token)
 }
 
 func (handler *CallbackHandler) getNewUserService() UserService {
@@ -60,12 +60,17 @@ func (handler *CallbackHandler) login() {
 	if handler.hasError() {
 		return
 	}
-	handler.err = handler.LoginService.Login(handler.user.LoginId())
+	service := handler.getNewLoginService()
+	handler.err = service.Login(handler.user.LoginId())
+}
+
+func (handler *CallbackHandler) getNewLoginService() LoginService {
+	return handler.LoginServiceFactory.NewLoginService(handler.Context)
 }
 
 func (handler *CallbackHandler) setResponse() {
 	if handler.hasError() {
-		handler.Context.JSON(http.StatusInternalServerError, handler.err)
+		handler.Context.JSON(http.StatusInternalServerError, handler.err.Error())
 	} else {
 		handler.Context.Status(http.StatusOK)
 	}

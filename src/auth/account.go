@@ -21,6 +21,7 @@ type Account interface {
 	GetTokenExpire() time.Time
 	SetTokenExpire(time.Time)
 	Create() error
+	Find() error
 	Exists() bool
 }
 
@@ -77,8 +78,13 @@ func (account *AccountModel) SetTokenExpire(expire time.Time) {
 	account.Expire = expire
 }
 
-func (account *AccountModel) Exists() bool {
+func (account *AccountModel) Find() error {
 	result := DB.Where("login_id=?", account.LoginID).First(account)
+	return result.Error
+}
+
+func (account *AccountModel) Exists() bool {
+	result := DB.Where("login_id=?", account.LoginID).First(&AccountModel{})
 	return result.Error == nil
 }
 
@@ -88,12 +94,14 @@ func (account *AccountModel) Create() error {
 }
 
 func AssociateAccount(user User, token *oauth2.Token) error {
+	// ログインIDで検索して既にあれば何もしない。
 	account := NewAccount()
 	account.SetLoginID(user.LoginId())
 	if account.Exists() {
 		return nil
 	}
 
+	// アカウントがアプリに存在しない場合残りのフィールドをセットしてアカウントの作成
 	account.SetAccessToken(token.AccessToken)
 	account.SetRefreshToken(token.RefreshToken)
 	account.SetTokenExpire(token.Expiry)

@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	ErrSessionValueNotFound = errors.New("session value not found")
 	ErrServerSideStateEmpty = errors.New("server side state is empty")
 	ErrQueryStateEmpty      = errors.New("query state is empty")
 	ErrStateNotMatch        = errors.New("state does not match")
@@ -38,6 +39,6 @@ func ErrorCode(err error) int {
 	case ErrAccessDatabase:
 		return CodeAccessDatabase
 	default:
-		return -1
+		return http.StatusInternalServerError
 	}
 }

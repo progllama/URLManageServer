@@ -9,6 +9,10 @@ type LogoutService interface {
 	Logout(id string) error
 }
 
+type LogoutServiceFactory interface {
+	NewLogoutService(*gin.Context) LogoutService
+}
+
 func NewLogoutService(context *gin.Context) LogoutService {
 	return &logoutService{
 		context,

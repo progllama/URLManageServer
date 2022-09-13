@@ -7,7 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/joho/godotenv v1.4.0
-	github.com/mattn/go-colorable v0.1.6
+	github.com/pkg/errors v0.9.1
 	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
 	google.golang.org/api v0.95.0
 	gorm.io/driver/postgres v1.3.9
