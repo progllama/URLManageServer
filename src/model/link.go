@@ -1,17 +1,21 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
+)
 
 type Link struct {
 	gorm.Model
-	UserID uint
-	User   User
-	Title  string `json:"title"`
-	URL    string `json:"url"`
+	UserID   uint
+	User     User
+	FolderID uint
+	Title    string `json:"title"`
+	URL      string `json:"url"`
 }
 
-func NewLink(id int) *Link {
-	l := Link{}
-	l.ID = uint(id)
-	return &l
+func (link *Link) IsValid() bool {
+	validator := validator.New()
+	err := validator.Struct(link)
+	return err != nil
 }

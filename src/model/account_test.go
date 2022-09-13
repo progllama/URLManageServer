@@ -15,6 +15,7 @@ func TestAccount(t *testing.T) {
 	t.Run("normal", func(t *testing.T) {
 		account := model.Account{
 			OpenId: "3uoafdfakb",
+			UserID: 1,
 		}
 		validator := validator.New()
 		err := validator.Struct(account)
@@ -60,6 +61,7 @@ func TestAccount(t *testing.T) {
 		}
 		account := model.Account{
 			OpenId: string(testId),
+			UserID: 1,
 		}
 		validator := validator.New()
 		err := validator.Struct(account)
@@ -84,11 +86,17 @@ func TestAccount(t *testing.T) {
 	})
 
 	t.Run("duplicate openid should be error", func(t *testing.T) {
-		account := model.Account{}
-		validator := validator.New()
-		err := validator.Struct(account)
+		account := model.Account{OpenId: "abcdefg"}
+		db, _ := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Silent),
+		})
+		con, _ := db.DB()
+		defer con.Close()
+		db.AutoMigrate(model.Account{})
+		db.Create(&account)
+		err := db.Create(&account).Error
 		if err == nil {
-			t.Fatal(err)
+			t.Error(err)
 		}
 	})
 
@@ -140,6 +148,43 @@ func TestAccount(t *testing.T) {
 		err := db.Create(&account).Error
 		if err == nil {
 			t.Error(err)
+		}
+	})
+
+	t.Run("duplicate UserID should be error", func(t *testing.T) {
+		db, _ := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Silent),
+		})
+		con, _ := db.DB()
+		defer con.Close()
+		db.AutoMigrate(&model.Account{})
+		account := model.Account{
+			OpenId: "abcd1234",
+			UserID: 1,
+		}
+		account2 := model.Account{
+			OpenId: "abcd5678",
+			UserID: 1,
+		}
+		db.Create(&account)
+		err := db.Create(&account2)
+		if err == nil {
+			t.Fatal(err)
+		}
+	})
+
+	t.Run("blank UserID should be error", func(t *testing.T) {
+		db, _ := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Silent),
+		})
+		con, _ := db.DB()
+		defer con.Close()
+		db.AutoMigrate(&model.Account{})
+		account := model.Account{}
+		db.Create(&account)
+		err := db.Create(&account)
+		if err == nil {
+			t.Fatal(err)
 		}
 	})
 }

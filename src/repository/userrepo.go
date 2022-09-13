@@ -1,41 +1,66 @@
 package repository
 
 import (
-	"log"
+	"errors"
 	"url_manager/model"
+
+	"gorm.io/gorm"
 )
 
-type UserRepository struct {
+type UserRepository interface {
+	All() ([]model.User, error)
+	Get(int) (model.User, error)
+	Create(model.User) (model.User, error)
+	Update(model.User) (model.User, error)
+	Delete(int) error
 }
 
-// used login
-func (repo *UserRepository) GetByUserId(uid string) model.User {
-	db := getDB()
+type userRepository struct {
+	db *gorm.DB
+}
+
+func NewUserRepository(db *gorm.DB) UserRepository {
+	return &userRepository{db}
+}
+
+func (repo *userRepository) All() ([]model.User, error) {
+	var users []model.User
+	resultSet := repo.db.Select("id, name").Find(&users)
+	return users, resultSet.Error
+}
+
+func (repo *userRepository) Get(id int) (model.User, error) {
 	var user model.User
-	log.Println(uid)
-	db.Where("user_id=?", uid).Find(&user)
-	return user
+	resultSet := repo.db.Select("id, name").Where("id=?", id).First(&user)
+	if errors.Is(resultSet.Error, gorm.ErrRecordNotFound) {
+		return model.User{}, ErrItemNotFound
+	}
+	return user, resultSet.Error
 }
 
-func (repo *UserRepository) Create(u model.User) model.User {
-	db := getDB()
-	db.Create(&u)
+func (repo *userRepository) Create(u model.User) (model.User, error) {
+	resultSet := repo.db.Create(&u)
+	if resultSet.Error != nil {
+		return u, resultSet.Error
+	}
+
 	var created model.User
-	db.Where("user_id=?", u.UserID).Find(&created)
-	return created
+	resultSet = repo.db.Select("id, name").Where("name=?", u.Name).First(&created)
+	return created, resultSet.Error
 }
 
-func (repo *UserRepository) Update(id int, u model.User) model.User {
-	db := getDB()
-	db.Where("id=?", id).Save(&u)
+func (repo *userRepository) Update(u model.User) (model.User, error) {
+	resultSet := repo.db.Where("id=?", u.ID).Save(&u)
+	if resultSet.Error != nil {
+		return u, resultSet.Error
+	}
 	var updated model.User
-	db.Where("id=?", id).Find(&updated)
-	return updated
+	resultSet = repo.db.Select("id, name").Where("id=?", u.ID).First(&updated)
+	return updated, resultSet.Error
 }
 
-func (repo *UserRepository) Delete(id int) {
-	db := getDB()
+func (repo *userRepository) Delete(id int) error {
 	u := model.User{}
 	u.ID = uint(id)
-	db.Delete(&u)
+	return repo.db.Delete(&u).Error
 }
