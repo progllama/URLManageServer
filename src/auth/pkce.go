@@ -9,21 +9,12 @@ import (
 	"strings"
 )
 
-const (
-	DefaultLength = 32
-)
-
-type Pkce interface {
-	CodeVerifier() string
-	CodeChallenge() string
-}
-
 type pkce struct {
 	Value string
 }
 
-func NewPkce() Pkce {
-	buf, err := randomBytes(DefaultLength)
+func NewPKCE() *pkce {
+	buf, err := randomBytes(32)
 	if err != nil {
 		return nil
 	}
