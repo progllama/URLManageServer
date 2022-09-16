@@ -1,10 +1,15 @@
 {
     "makefile.extensionOutputFolder": "./.vscode",
     "cSpell.words": [
+        "alphanum",
+        "Browsable",
         "dotenv",
+        "foreignkey",
+        "goauth",
         "gonic",
         "Gorm",
         "memstore",
-        "mysession"
+        "mysession",
+        "Pkce"
     ]
 }

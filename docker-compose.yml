@@ -3,19 +3,11 @@ version: '3'
 services:
   app:
     build: .
-    depends_on:
-      postgres:
-        condition: service_healthy
     ports:
       - "8000:8000"
   postgres:
     image: postgres:latest
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5    
     environment:
       POSTGRES_USER: gorm
       POSTGRES_PASSWORD: gorm
@@ -41,8 +33,6 @@ services:
     restart: always
     ports:
       - 8080:8080
-    depends_on:
-      - postgres
     
 volumes:
   postgres:

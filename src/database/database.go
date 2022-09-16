@@ -3,67 +3,53 @@ package database
 import (
 	"fmt"
 	"log"
-	"os"
-	"strings"
 	"url_manager/model"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
+var DB *gorm.DB
+
+var (
+	HOST     string
+	USER     string
+	PASSWORD string
+	DBNAME   string
+	PORT     string
+	SSLMODE  string
+	TIMEZONE string
+)
 
 func Connect() {
-	dsn := getDSN()
-	config := getConfig()
-	var err error
-	db, err = openDB(dsn, config)
+	dsn := DSN()
+	DB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	db.AutoMigrate(
+	err = DB.AutoMigrate(
 		&model.User{},
 		&model.Link{},
 	)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func Disconnect() {
-	if con, err := db.DB(); err != nil {
+	if con, err := DB.DB(); err != nil {
 		con.Close()
 	}
 }
 
-func GetDB() *gorm.DB {
-	return db
-}
-
-func getDSN() string {
-	keys := dsnKeys()
-	dsn := make([]string, len(keys))
-	for i, key := range keys {
-		value := os.Getenv(strings.ToUpper(key))
-		dsn[i] = fmt.Sprintf("%s=%s ", key, value)
-	}
-	return strings.Join(dsn, " ")
-}
-
-func getConfig() *gorm.Config {
-	return &gorm.Config{}
+func DSN() string {
+	return fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
+		HOST, USER, PASSWORD, DBNAME, PORT, SSLMODE, TIMEZONE,
+	)
 }
 
 func openDB(dsn string, config *gorm.Config) (*gorm.DB, error) {
-	return gorm.Open(postgres.Open(dsn), config)
-}
-
-func dsnKeys() []string {
-	return []string{
-		"host",
-		"user",
-		"password",
-		"dbname",
-		"port",
-		"sslmode",
-		"TimeZone",
-	}
+	return gorm.Open(postgres.Open(dsn), &gorm.Config{})
 }
