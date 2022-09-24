@@ -1,0 +1,21 @@
+{{ define "title" }}
+<title>Index Folder</title>
+{{ end }}
+
+{{ define "content" }}
+<div class="container">
+  <h1>Index Folder</h1>
+  <a href="/users/{{ .LoginId }}/folders/new">追加</a>
+  <div class="m-3">
+  <table>
+    {{ range $i, $v := .Folders }}
+    <tr>
+      <td>{{ $v.Title }}</td>
+      <td><a href="/users/{{ .LoginId }}/folders/{{ $v.Id }}/edit">編集</a></td>
+      <td><a href="/users/{{ .LoginId }}/folders/{{ $v.Id }}/delete">削除</a></td>
+    </tr>
+    {{ end }}
+  </table>
+  </div>
+</div>
+{{ end }}

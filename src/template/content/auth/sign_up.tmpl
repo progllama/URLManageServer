@@ -1,0 +1,32 @@
+{{ define "title" }}
+<title>SignUp</title>
+{{ end }}
+
+{{ define "content" }}
+<h1>SignUp</h1>
+<div class="container-sm p-3">
+  <form action="/auth/sign_up" method="post">
+    <div class="row m-3">
+      <div class="col-lg-1">
+        <lable>LoginID</label>
+      </div>
+      <div class="col-lg-3">
+        <input type="text" name="loginId"/>
+      </div>
+    </div>
+    <div class="row m-3">
+      <div class="col-lg-1">
+        <lable>Password</label>
+      </div>
+      <div class="col-lg-3">
+        <input type="password" name="password"/>
+      </div>
+    </div>
+    <div class="row m-3">
+      <div class="col-lg-4 text-center">
+        <input class="btn btn-primary" type="submit" value="send">
+      </div>
+    </div>
+  </form>
+</div>
+{{ end }}

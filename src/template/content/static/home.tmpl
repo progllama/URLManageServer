@@ -1,0 +1,15 @@
+{{ define "title" }}
+<title>Home</title>
+{{ end }}
+
+{{ define "content" }}
+<div class="container">
+<h1>Home</h1>
+  {{ if .IsLogin }}
+    <ul>
+      <li><a href="/users/{{ .LoginId }}/links">Links</a></li>
+      <li><a href="/users/{{ .LoginId }}/folders">Folders</a></li>
+    </ul>
+  {{ end }}
+</div>
+{{ end }}

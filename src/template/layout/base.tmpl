@@ -1,0 +1,9 @@
+{{ define "base" }}
+<!DOCTYPE html>
+<html lang=ja>
+{{ block "head" . }}{{ end }}
+{{ block "body" . }}{{ end }}
+</html>
+{{ end }}
+
+{{ template "base" . }}

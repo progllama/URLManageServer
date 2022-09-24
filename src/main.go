@@ -1,13 +1,7 @@
 package main
 
-import (
-	"os"
-
-	"github.com/gin-gonic/gin"
-)
+import "url_manager/app"
 
 func main() {
-	e := gin.Default()
-
-	e.Run(os.Getenv(":8080"))
+	app.Run()
 }

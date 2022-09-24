@@ -1,0 +1,16 @@
+{{ define "title" }}
+<title>New Folder</title>
+{{ end }}
+
+{{ define "content" }}
+<div class="container">
+<h1>New</h1>
+<div>
+  <form action="/users/{{ .LoginId }}/folders" method="post">
+    <label>Title</label>
+    <input type="text" name="title" />
+    <input type="submit" value="send" />
+  </form>
+</div>
+</div>
+{{ end }}

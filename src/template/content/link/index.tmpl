@@ -1,0 +1,27 @@
+{{ define "title" }}
+<title>Links</title>
+{{ end }}
+
+{{ define "content" }}
+{{ $LoginId := .LoginId }}
+<div class="container">
+  <h1>Link Index</h1>
+  <div class="row">
+    <div class="col-lg-1">
+      <a href="/users/{{ .LoginId }}/links/new">追加</a>
+    </div>
+  </div>
+  <div class="container m-3">
+    <table>
+      {{ range .Links }}
+        <tr>
+          <td><a href="{{ .URL }}">{{ .Title }}</a></td>
+          <td>{{ .Description }}</td>
+          <td><a href="/users/{{ $LoginId }}/links/{{ .Id }}/edit">編集</a></td>
+          <td><a href="/users/{{ $LoginId }}/links/{{ .Id }}/delete">削除</a></td>
+        </tr>
+      {{ end }}
+    </table>
+  </div>
+</div>
+{{ end }}
